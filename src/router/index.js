@@ -1,14 +1,33 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    {
-      path: '/',
-      name: 'home',
-      component: () => import('@/pages/index.vue'),
-    },
-  ],
+const pages = import.meta.glob('../pages/**/*.vue')
+
+const routes = Object.keys(pages).map((file) => {
+  let path = file
+    .replace('../pages', '')
+    .replace('.vue', '')
+    .replace('/index', '')
+    .replace(/\[(.+?)\]/g, ':$1')
+
+  if (path === '') path = '/'
+
+  return {
+    path,
+    component: pages[file],
+  }
 })
 
-export default router
+const notFoundPage = pages['../pages/404.vue']
+
+if (notFoundPage) {
+  routes.push({
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: notFoundPage,
+  })
+}
+
+export default createRouter({
+  history: createWebHistory(),
+  routes,
+})
