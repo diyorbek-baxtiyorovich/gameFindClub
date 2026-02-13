@@ -1,12 +1,10 @@
 <template>
   <div class="sheet" :style="sheetStyle">
-    <!-- PREVIEW (CLOSED HOLATDA) -->
     <div v-if="isClosed" class="sheet-preview" @click="openSheet">
       <div class="preview-handle"></div>
       <span>Nearby Venues</span>
     </div>
 
-    <!-- HEADER -->
     <div class="sheet-header">
       <div>
         <h3>Nearby Venues</h3>
@@ -16,7 +14,6 @@
       <button class="close-btn" @click="closeSheet">✕</button>
     </div>
 
-    <!-- CONTENT -->
     <div ref="contentRef" class="sheet-content" @touchstart="detectDirection">
       <div class="card-row">
         <div v-for="item in items" :key="item.id" class="venue-card" @click="openDetail(item.id)">
@@ -57,7 +54,17 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-const screenH = window.innerHeight
+const getScreenHeight = () => {
+  const tg = window.Telegram?.WebApp
+
+  if (tg?.viewportHeight) {
+    return tg.viewportHeight
+  }
+
+  return window.innerHeight
+}
+
+const screenH = getScreenHeight()
 
 const SNAP = {
   FULL: 60,
@@ -167,12 +174,24 @@ onMounted(() => {
 
   tg.ready()
   tg.expand()
-  tg.disableVerticalSwipes()
+
+  tg.onEvent('viewportChanged', () => {
+    const h = tg.viewportHeight
+
+    SNAP.HALF = h * 0.5
+    SNAP.CLOSED = h - 140
+  })
+
+  if (parseFloat(tg.version) >= 6.1) {
+    tg.disableVerticalSwipes()
+  }
 })
 </script>
 
 <style scoped>
 .sheet {
+  max-height: 100dvh;
+  height: 100dvh;
   position: fixed;
   inset: 0;
 
