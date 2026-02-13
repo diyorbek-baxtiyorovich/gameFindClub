@@ -1,12 +1,10 @@
 <template>
   <div class="sheet" :style="sheetStyle">
-    <!-- PREVIEW (CLOSED HOLATDA) -->
     <div v-if="isClosed" class="sheet-preview" @click="openSheet">
       <div class="preview-handle"></div>
       <span>Nearby Venues</span>
     </div>
 
-    <!-- HEADER -->
     <div class="sheet-header">
       <div>
         <h3>Nearby Venues</h3>
@@ -16,7 +14,6 @@
       <button class="close-btn" @click="closeSheet">✕</button>
     </div>
 
-    <!-- CONTENT -->
     <div ref="contentRef" class="sheet-content" @touchstart="detectDirection">
       <div class="card-row">
         <div v-for="item in items" :key="item.id" class="venue-card" @click="openDetail(item.id)">
@@ -276,7 +273,9 @@ onMounted(() => {
 }
 
 .venue-card {
+  width: 260px;
   min-width: 260px;
+  max-width: 260px;
 
   background: #1c2230;
 
