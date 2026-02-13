@@ -19,9 +19,7 @@ import BottomNav from '@/components/ui/BottomNav.vue'
   width: 100%;
   height: 100dvh;
   max-width: 1000px;
-
   margin: 0 auto;
-
   display: flex;
   flex-direction: column;
 

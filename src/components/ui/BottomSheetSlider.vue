@@ -98,11 +98,10 @@ const items = ref([
 ])
 
 const openDetail = (id) => {
-  router.push({
-    name: `card-page/${id}`,
-  })
-}
+  console.log(id)
 
+  router.push(`/card/${id}`)
+}
 const startDrag = (e) => {
   startY = e.touches[0].clientY
   startTranslate = translateY.value

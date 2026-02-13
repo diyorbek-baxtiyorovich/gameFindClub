@@ -77,6 +77,75 @@
         </div>
       </div>
     </v-card>
+
+    <v-card class="section-card">
+      <div class="section-title">
+        <v-icon color="purple">mdi-clock-outline</v-icon>
+        <span>Working Hours</span>
+      </div>
+
+      <div class="hours-row" v-for="(item, i) in workingHours" :key="i">
+        <span class="day">{{ item.day }}</span>
+        <span class="time">{{ item.time }}</span>
+      </div>
+    </v-card>
+
+    <v-card class="section-card">
+      <div class="section-title">
+        <v-icon color="purple">mdi-email-outline</v-icon>
+        <span>Contact Info</span>
+      </div>
+
+      <div class="contact-item">
+        <v-icon size="18" color="grey-lighten-1">mdi-map-marker-outline</v-icon>
+        <div>
+          <p>{{ contact.address }}</p>
+          <small>{{ contact.sub }}</small>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <v-icon size="18" color="grey-lighten-1">mdi-phone-outline</v-icon>
+        <p>{{ contact.phone }}</p>
+      </div>
+    </v-card>
+
+    <v-card class="section-card">
+      <div class="reviews-header">
+        <div class="section-title">
+          <v-icon color="purple">mdi-star-outline</v-icon>
+          <span>User Reviews</span>
+        </div>
+
+        <span class="view-all">View All</span>
+      </div>
+
+      <div v-for="review in reviews" :key="review.name" class="review-item">
+        <v-avatar size="40">
+          <img :src="review.avatar" />
+        </v-avatar>
+
+        <div class="review-content">
+          <div class="review-top">
+            <strong>{{ review.name }}</strong>
+            <small>{{ review.time }}</small>
+          </div>
+
+          <div class="stars">
+            <v-icon
+              v-for="n in 5"
+              :key="n"
+              size="16"
+              :color="n <= review.rating ? 'yellow' : 'grey'"
+            >
+              mdi-star
+            </v-icon>
+          </div>
+
+          <p>{{ review.text }}</p>
+        </div>
+      </div>
+    </v-card>
   </v-container>
 </template>
 
@@ -130,6 +199,34 @@ const pricing = [
     price: 18,
     icon: 'mdi-account-group',
     vip: false,
+  },
+]
+
+const workingHours = [
+  { day: 'Monday - Friday', time: 'Open 24 Hours' },
+  { day: 'Saturday - Sunday', time: 'Open 24 Hours' },
+]
+
+const contact = {
+  address: 'Main Street 124, 2nd Floor',
+  sub: 'Business District, NYC',
+  phone: '+1 (555) 000-9988',
+}
+
+const reviews = [
+  {
+    name: 'Marcus Thorne',
+    time: '2 days ago',
+    rating: 5,
+    avatar: 'https://i.pravatar.cc/100?img=1',
+    text: 'Best gaming club in town! The equipment is top-notch.',
+  },
+  {
+    name: 'Sarah Jenkins',
+    time: '1 week ago',
+    rating: 4,
+    avatar: 'https://i.pravatar.cc/100?img=2',
+    text: 'Great atmosphere for team practice. Worth it.',
   },
 ]
 </script>
@@ -263,5 +360,81 @@ const pricing = [
 .price-right {
   color: #a78bfa;
   font-weight: 600;
+}
+
+.hours-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  color: #cbd5e1;
+}
+
+.day {
+  opacity: 0.7;
+}
+
+.time {
+  font-weight: 600;
+}
+
+.contact-item {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  align-items: flex-start;
+}
+
+.contact-item p {
+  color: #ededef;
+  margin: 0;
+}
+
+.contact-item small {
+  color: #94a3b8;
+}
+
+.reviews-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.view-all {
+  color: #a78bfa;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.review-item {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.review-content {
+  flex: 1;
+}
+
+.review-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #ededef;
+}
+
+.review-top small {
+  opacity: 0.6;
+}
+
+.stars {
+  display: flex;
+  gap: 2px;
+  margin: 4px 0;
+}
+
+.review-content p {
+  font-size: 13px;
+  color: #94a3b8;
+  margin: 0;
 }
 </style>

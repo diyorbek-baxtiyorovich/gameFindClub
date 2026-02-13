@@ -11,12 +11,14 @@ const routes = Object.keys(pages).map((file) => {
 
   if (path === '') path = '/'
 
+  const name = path.replace('/', '').replace(/\/:/g, '-').replace(/\//g, '-')
+
   return {
     path,
+    name,
     component: pages[file],
   }
 })
-
 const notFoundPage = pages['../pages/404.vue']
 
 if (notFoundPage) {

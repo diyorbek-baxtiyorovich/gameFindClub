@@ -50,7 +50,6 @@ const isActive = (path) => route.path === path
 
 .bottom-nav {
   width: 100%;
-  //max-width: 420px;
 
   border-radius: 0 0 20px 20px;
 

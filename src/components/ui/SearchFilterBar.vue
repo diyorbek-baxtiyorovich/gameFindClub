@@ -12,7 +12,7 @@
         />
       </div>
 
-      <v-btn icon variant="flat" class="filter-btn" @click="$emit('openFilter')">
+      <v-btn icon variant="flat" class="filter-btn" @click="openFilterModel">
         <v-icon color="#6D28D9">mdi-tune-vertical-variant</v-icon>
       </v-btn>
     </div>
@@ -28,16 +28,20 @@
         {{ item.label }}
       </button>
     </div>
+
+    <FilterDialog v-model="showFilter" @apply="onApply" />
   </div>
 </template>
 
 <script setup>
 import { ref, watch } from 'vue'
+import FilterDialog from '@/components/ui/FilterDialog.vue'
 
 const emit = defineEmits(['search', 'filter', 'openFilter'])
 
 const search = ref('')
 const activeFilter = ref('all')
+const showFilter = ref(false)
 
 const filters = [
   { key: 'all', label: 'All Venues' },
@@ -52,6 +56,14 @@ const filters = [
 const setFilter = (key) => {
   activeFilter.value = key
   emit('filter', key)
+}
+
+const openFilterModel = () => {
+  showFilter.value = true
+}
+
+const onApply = (filters) => {
+  console.log('Filters:', filters)
 }
 
 watch(search, (val) => {

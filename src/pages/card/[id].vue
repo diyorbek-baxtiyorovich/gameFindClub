@@ -5,8 +5,8 @@
   </div>
 </template>
 <script setup>
-import VenueDetail from '@/pages/card-page/components/VenueDetail.vue'
-import InfoDetails from '@/pages/card-page/components/InfoDetails.vue'
+import VenueDetail from '@/pages/card/components/VenueDetail.vue'
+import InfoDetails from '@/pages/card/components/InfoDetails.vue'
 </script>
 <style scoped>
 .card-page {
