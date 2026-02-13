@@ -18,20 +18,24 @@ import BottomNav from '@/components/ui/BottomNav.vue'
 .app-layout {
   width: 100%;
   height: 100dvh;
+
   max-width: 1000px;
   margin: 0 auto;
+
   display: flex;
   flex-direction: column;
 
-  overflow: hidden;
   background: #2d3441;
 }
 
+/* Scroll faqat contentda */
 .content {
   flex: 1;
 
   overflow-y: auto;
 
-  padding-bottom: calc(56px + env(safe-area-inset-bottom));
+  -webkit-overflow-scrolling: touch;
+
+  padding-bottom: env(safe-area-inset-bottom);
 }
 </style>

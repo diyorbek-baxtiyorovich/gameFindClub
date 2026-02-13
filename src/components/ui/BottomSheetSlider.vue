@@ -1,24 +1,27 @@
 <template>
   <div class="sheet" :style="sheetStyle">
-    <div class="drag-area" @touchstart="startDrag" @touchmove="onDrag" @touchend="endDrag">
-      <div class="handle"></div>
+    <!-- PREVIEW (CLOSED HOLATDA) -->
+    <div v-if="isClosed" class="sheet-preview" @click="openSheet">
+      <div class="preview-handle"></div>
+      <span>Nearby Venues</span>
+    </div>
 
-      <div class="sheet-header">
+    <!-- HEADER -->
+    <div class="sheet-header">
+      <div>
         <h3>Nearby Venues</h3>
         <span>{{ items.length }} results</span>
       </div>
+
+      <button class="close-btn" @click="closeSheet">✕</button>
     </div>
 
-    <div ref="contentRef" class="sheet-content">
+    <!-- CONTENT -->
+    <div ref="contentRef" class="sheet-content" @touchstart="detectDirection">
       <div class="card-row">
-        <div
-          v-for="item in items"
-          :key="item.id"
-          class="venue-card"
-          @touchend.stop="openDetail(item.id)"
-        >
+        <div v-for="item in items" :key="item.id" class="venue-card" @click="openDetail(item.id)">
           <div class="card-img">
-            <img v-if="item.image" :src="item.image" :alt="item.name" />
+            <img v-if="item.image" :src="item.image" />
 
             <div v-else class="no-image">No Image</div>
 
@@ -26,7 +29,7 @@
               {{ item.open ? 'Open' : 'Closed' }}
             </span>
 
-            <span class="rate"> ⭐ {{ item.rate }} </span>
+            <span class="rate">⭐ {{ item.rate }}</span>
           </div>
 
           <div class="card-body">
@@ -43,25 +46,33 @@
         </div>
       </div>
     </div>
+
+    <div class="drag-zone" @touchstart="startDrag" @touchmove="onDrag" @touchend="endDrag"></div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
-const screenH = window.innerHeight
 const router = useRouter()
+
+const screenH = window.innerHeight
+
 const SNAP = {
-  CLOSED: screenH * 0.8,
-  HALF: screenH * 0.4,
-  FULL: 40,
+  FULL: 60,
+  HALF: screenH * 0.45,
+  CLOSED: screenH - 50,
 }
 
 const translateY = ref(SNAP.HALF)
 
+const isClosed = computed(() => {
+  return translateY.value >= SNAP.CLOSED - 5
+})
+
 let startY = 0
-let startTranslate = 0
+let startX = 0
 
 const items = ref([
   {
@@ -98,23 +109,31 @@ const items = ref([
 ])
 
 const openDetail = (id) => {
-  console.log(id)
-
   router.push(`/card/${id}`)
 }
+
+const detectDirection = (e) => {
+  startX = e.touches[0].clientX
+  startY = e.touches[0].clientY
+}
+
 const startDrag = (e) => {
   startY = e.touches[0].clientY
-  startTranslate = translateY.value
 }
 
 const onDrag = (e) => {
-  const diff = e.touches[0].clientY - startY
+  const diffY = e.touches[0].clientY - startY
+  const diffX = e.touches[0].clientX - startX
 
-  let next = startTranslate + diff
+  if (Math.abs(diffX) > Math.abs(diffY)) return
+
+  let next = translateY.value + diffY
 
   next = Math.max(SNAP.FULL, Math.min(SNAP.CLOSED, next))
 
   translateY.value = next
+
+  startY = e.touches[0].clientY
 }
 
 const endDrag = () => {
@@ -129,15 +148,33 @@ const endDrag = () => {
   }
 }
 
+const closeSheet = () => {
+  translateY.value = SNAP.CLOSED
+}
+
+const openSheet = () => {
+  translateY.value = SNAP.HALF
+}
+
 const sheetStyle = computed(() => ({
   transform: `translateY(${translateY.value}px)`,
 }))
+
+onMounted(() => {
+  const tg = window.Telegram?.WebApp
+
+  if (!tg) return
+
+  tg.ready()
+  tg.expand()
+  tg.disableVerticalSwipes()
+})
 </script>
 
 <style scoped>
 .sheet {
   position: fixed;
-  inset: 0 0 0 0;
+  inset: 0;
 
   background: #141821;
 
@@ -151,39 +188,70 @@ const sheetStyle = computed(() => ({
   will-change: transform;
 
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
-.drag-area {
-  padding-bottom: 6px;
+.sheet-preview {
+  position: absolute;
 
-  touch-action: pan-y;
+  top: -46px;
+  left: 0;
+  right: 0;
 
-  cursor: grab;
+  height: 46px;
+
+  background: #141821;
+
+  border-radius: 20px 20px 0 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  color: white;
+  font-size: 14px;
+
+  cursor: pointer;
 }
 
-.handle {
-  width: 48px;
-  height: 5px;
+.preview-handle {
+  width: 34px;
+  height: 4px;
 
   background: #666;
 
   border-radius: 999px;
-
-  margin: 10px auto 6px;
 }
-
 .sheet-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 
-  padding: 8px 18px;
+  padding: 10px 18px;
 
   color: #f3f4f6;
 }
 
 .sheet-header h3 {
   font-size: 16px;
+}
+
+.close-btn {
+  width: 32px;
+  height: 32px;
+
+  border-radius: 50%;
+  border: none;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  color: white;
+  font-size: 18px;
+
+  cursor: pointer;
 }
 
 .sheet-content {
@@ -234,6 +302,7 @@ const sheetStyle = computed(() => ({
 
 .card-img {
   height: 120px;
+
   background: #2d3441;
 
   position: relative;
@@ -245,8 +314,6 @@ const sheetStyle = computed(() => ({
   height: 100%;
 
   object-fit: cover;
-
-  display: block;
 }
 
 .no-image {
@@ -260,7 +327,6 @@ const sheetStyle = computed(() => ({
   justify-content: center;
 
   color: #d4dae6;
-  font-size: 12px;
 }
 
 .status {
@@ -334,5 +400,10 @@ const sheetStyle = computed(() => ({
   border-radius: 999px;
 
   font-size: 11px;
+}
+
+.drag-zone {
+  height: 26px;
+  width: 100%;
 }
 </style>
