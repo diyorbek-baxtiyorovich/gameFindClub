@@ -1,10 +1,12 @@
 <template>
   <div class="sheet" :style="sheetStyle">
+    <!-- PREVIEW (CLOSED HOLATDA) -->
     <div v-if="isClosed" class="sheet-preview" @click="openSheet">
       <div class="preview-handle"></div>
       <span>Nearby Venues</span>
     </div>
 
+    <!-- HEADER -->
     <div class="sheet-header">
       <div>
         <h3>Nearby Venues</h3>
@@ -14,11 +16,12 @@
       <button class="close-btn" @click="closeSheet">✕</button>
     </div>
 
+    <!-- CONTENT -->
     <div ref="contentRef" class="sheet-content" @touchstart="detectDirection">
       <div class="card-row">
         <div v-for="item in items" :key="item.id" class="venue-card" @click="openDetail(item.id)">
           <div class="card-img">
-            <img v-if="item.image" :src="item.image" :alt="item.name" />
+            <img v-if="item.image" :src="item.image" />
 
             <div v-else class="no-image">No Image</div>
 
@@ -54,17 +57,7 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-const getScreenHeight = () => {
-  const tg = window.Telegram?.WebApp
-
-  if (tg?.viewportHeight) {
-    return tg.viewportHeight
-  }
-
-  return window.innerHeight
-}
-
-const screenH = getScreenHeight()
+const screenH = window.innerHeight
 
 const SNAP = {
   FULL: 60,
@@ -168,30 +161,15 @@ const sheetStyle = computed(() => ({
 }))
 
 onMounted(() => {
-  const tg = window.Telegram?.WebApp
-
-  if (!tg) return
-
-  tg.ready()
-  tg.expand()
-
-  tg.onEvent('viewportChanged', () => {
-    const h = tg.viewportHeight
-
-    SNAP.HALF = h * 0.5
-    SNAP.CLOSED = h - 140
-  })
-
-  if (parseFloat(tg.version) >= 6.1) {
-    tg.disableVerticalSwipes()
+  if (window.Telegram?.WebApp) {
+    Telegram.WebApp.expand()
+    Telegram.WebApp.disableVerticalSwipes()
   }
 })
 </script>
 
 <style scoped>
 .sheet {
-  max-height: 100dvh;
-  height: 100dvh;
   position: fixed;
   inset: 0;
 
@@ -321,26 +299,31 @@ onMounted(() => {
 
 .card-img {
   height: 120px;
+
   background: #2d3441;
+
   position: relative;
   overflow: hidden;
 }
+
 .card-img img {
   width: 100%;
   height: 100%;
+
   object-fit: cover;
-  display: block;
 }
 
 .no-image {
   width: 100%;
   height: 100%;
+
   background: #1f2937;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   color: #d4dae6;
-  font-size: 12px;
 }
 
 .status {
