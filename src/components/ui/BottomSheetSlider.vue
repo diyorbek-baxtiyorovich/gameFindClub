@@ -18,7 +18,7 @@
       <div class="card-row">
         <div v-for="item in items" :key="item.id" class="venue-card" @click="openDetail(item.id)">
           <div class="card-img">
-            <img v-if="item.image" :src="item.image" />
+            <img v-if="item.image" :src="item.image" :alt="item.name" />
 
             <div v-else class="no-image">No Image</div>
 
@@ -321,31 +321,26 @@ onMounted(() => {
 
 .card-img {
   height: 120px;
-
   background: #2d3441;
-
   position: relative;
   overflow: hidden;
 }
-
 .card-img img {
   width: 100%;
   height: 100%;
-
   object-fit: cover;
+  display: block;
 }
 
 .no-image {
   width: 100%;
   height: 100%;
-
   background: #1f2937;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   color: #d4dae6;
+  font-size: 12px;
 }
 
 .status {
