@@ -25,6 +25,7 @@ import type { VenuePrimaryAction } from '@/entities/venue'
 import { selectPrimaryVenueAction } from '@/entities/venue'
 import { getTelegramService } from '@/services'
 import { useFavoritesStore, useHistoryStore, useVenuesStore } from '@/stores'
+import { t } from '@/i18n'
 
 const props = defineProps<{ slug: string }>()
 const router = useRouter()
@@ -50,20 +51,20 @@ onUnmounted(() => { venues.cancelPending(); venues.clearSelected() })
 
 <template>
   <section class="venue-detail-page">
-    <AppLoader v-if="venues.loading" label="Loading venue" />
-    <AppErrorState v-else-if="venues.error" title="Could not load venue" :description="venues.error" retry-label="Try again" @retry="venues.selectBySlug(slug)" />
+    <AppLoader v-if="venues.loading" :label="t('venue.loading')" />
+    <AppErrorState v-else-if="venues.error" :title="t('venue.load_error')" :description="venues.error" :retry-label="t('common.retry')" @retry="venues.selectBySlug(slug)" />
     <template v-else-if="venues.selected">
       <div class="venue-detail-page__hero">
         <VenueGallery :venue="venues.selected" />
-        <button class="venue-detail-page__hero-action venue-detail-page__back" type="button" aria-label="Orqaga" @click="router.back()"><AppLucideIcon name="arrow-left" :size="27" /></button>
-        <button class="venue-detail-page__hero-action venue-detail-page__heart" type="button" :aria-label="favorites.isFavorite(venues.selected.id) ? 'Saqlanganlardan olib tashlash' : 'Saqlash'" :aria-pressed="favorites.isFavorite(venues.selected.id)" @click="favorites.toggle(venues.selected.id)"><AppLucideIcon name="heart" :size="27" :filled="favorites.isFavorite(venues.selected.id)" /></button>
+        <button class="venue-detail-page__hero-action venue-detail-page__back" type="button" :aria-label="t('venue.back')" @click="router.back()"><AppLucideIcon name="arrow-left" :size="27" /></button>
+        <button class="venue-detail-page__hero-action venue-detail-page__heart" type="button" :aria-label="favorites.isFavorite(venues.selected.id) ? t('venue.unsave') : t('venue.save')" :aria-pressed="favorites.isFavorite(venues.selected.id)" @click="favorites.toggle(venues.selected.id)"><AppLucideIcon name="heart" :size="27" :filled="favorites.isFavorite(venues.selected.id)" /></button>
       </div>
       <div class="venue-detail-page__sheet">
         <span class="venue-detail-page__handle" aria-hidden="true" />
         <VenueHeader :venue="venues.selected" />
         <VenueActions :venue="venues.selected" @action="activate" />
         <VenueQuickFacts :venue="venues.selected" />
-        <section v-if="venues.selected.description" class="venue-detail-page__summary"><h2>Qisqacha</h2><p>{{ venues.selected.description }}</p></section>
+        <section v-if="venues.selected.description" class="venue-detail-page__summary"><h2>{{ t('venue.summary') }}</h2><p>{{ venues.selected.description }}</p></section>
         <VenuePricing :options="venues.selected.pricing" />
         <VenueActivities :items="venues.selected.activities" />
         <CategoryDetailSections :venue="venues.selected" />
@@ -76,7 +77,7 @@ onUnmounted(() => { venues.cancelPending(); venues.clearSelected() })
       </div>
       <StickyVenueCta :action="primaryAction" @activate="activate" />
     </template>
-    <AppErrorState v-else title="Venue not found" description="This venue may no longer be available." retry-label="" />
+    <AppErrorState v-else :title="t('venue.not_found')" :description="t('venue.not_found_description')" retry-label="" />
   </section>
 </template>
 

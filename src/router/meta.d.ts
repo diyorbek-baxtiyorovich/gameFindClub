@@ -9,5 +9,10 @@ declare module 'vue-router' {
     showBackButton?: boolean
     hideHeader?: boolean
     requiresAuth?: boolean
+    ownerOnly?: boolean
+    standaloneLayout?: boolean
+    ownerShowBottomNav?: boolean
+    hideOwnerHeader?: boolean
+    ownerTitleKey?: string
   }
 }

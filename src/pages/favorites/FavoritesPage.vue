@@ -23,7 +23,7 @@ const visibleItems = computed(() =>
     /><AppEmptyState
       v-if="visibleItems.length === 0"
       :title="t('favorites.empty')"
-      description="Save any venue to keep it close at hand."
+      :description="t('favorites.description')"
     /><VenueList v-else :items="visibleItems" @favorite="favorites.toggle($event.id)" />
   </section>
 </template>
@@ -34,4 +34,3 @@ const visibleItems = computed(() =>
   padding-block: var(--space-3);
 }
 </style>
- 

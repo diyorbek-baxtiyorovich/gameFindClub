@@ -127,6 +127,7 @@ h2 {
 .app-modal__footer {
   padding: var(--space-4);
 }
+@media (max-width: 350px) { .app-modal { padding-inline: calc(var(--space-2) + var(--safe-area-left)) calc(var(--space-2) + var(--safe-area-right)); } .app-modal__footer { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .app-modal__footer {
   display: flex;
   justify-content: flex-end;

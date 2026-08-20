@@ -1,6 +1,6 @@
 import type { FilterSchema } from '@/types'
 
-export type CategoryCode = 'gaming' | 'tennis' | 'football' | 'gym'
+export type CategoryCode = 'gaming' | 'tennis' | 'football' | 'gym' | 'padel' | 'billiard'
 export type CategoryAccent = 'gaming' | 'tennis' | 'football' | 'gym' | 'neutral'
 
 export interface LocalizedLabel {
@@ -35,4 +35,5 @@ export interface CategoryConfig {
   detailSections?: readonly CategoryDetailSection[]
   reviewCriteria?: readonly CategoryReviewCriterion[]
   highlights?: readonly CategoryHighlightRule[]
+  editorFields?: readonly FilterSchema[]
 }

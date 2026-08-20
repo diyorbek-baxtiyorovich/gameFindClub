@@ -13,11 +13,29 @@ export const localVenueRepository: VenueRepository = {
       if (params?.categoryId && venue.category.id !== params.categoryId) return false
       if (params?.bounds && venue.location) {
         const { north, south, east, west } = params.bounds
-        if (venue.location.latitude > north || venue.location.latitude < south || venue.location.longitude > east || venue.location.longitude < west) return false
+        if (
+          venue.location.latitude > north ||
+          venue.location.latitude < south ||
+          venue.location.longitude > east ||
+          venue.location.longitude < west
+        )
+          return false
       }
-      if (params?.latitude != null && params.longitude != null && params.radius != null && venue.distanceMeters != null && venue.distanceMeters > params.radius * 1000) return false
+      if (
+        params?.latitude != null &&
+        params.longitude != null &&
+        params.radius != null &&
+        venue.distanceMeters != null &&
+        venue.distanceMeters > params.radius * 1000
+      )
+        return false
       if (!search) return true
-      return [venue.name, venue.category.name, venue.address?.formatted, ...(venue.highlights ?? [])]
+      return [
+        venue.name,
+        venue.category.name,
+        venue.address?.formatted,
+        ...(venue.highlights ?? []),
+      ]
         .filter(Boolean)
         .some((value) => String(value).toLowerCase().includes(search))
     })

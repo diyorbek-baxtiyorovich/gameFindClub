@@ -3,6 +3,7 @@ import { useRoute } from 'vue-router'
 
 import { PRIMARY_NAVIGATION } from '@/config'
 import AppLucideIcon from '@/components/ui/AppLucideIcon.vue'
+import { t, type MessageKey } from '@/i18n'
 
 const route = useRoute()
 </script>
@@ -18,7 +19,7 @@ const route = useRoute()
       :aria-current="route.name === item.routeName ? 'page' : undefined"
     >
       <span class="bottom-nav__icon"><AppLucideIcon :name="item.icon" :size="23" /></span>
-      <span>{{ item.label }}</span>
+      <span>{{ t(item.labelKey as MessageKey) }}</span>
     </RouterLink>
   </nav>
 </template>

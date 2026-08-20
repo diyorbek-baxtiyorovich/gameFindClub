@@ -30,14 +30,21 @@ defineEmits<{ favorite: [venue: VenueListItem]; navigate: [venue: VenueListItem]
 </script>
 
 <template>
-  <div v-if="loading" class="venue-list" :class="`venue-list--${layout}`" aria-label="Loading venues">
+  <div
+    v-if="loading"
+    class="venue-list"
+    :class="`venue-list--${layout}`"
+    aria-label="Loading venues"
+  >
     <div v-for="index in skeletonCount" :key="index" class="venue-list__skeleton">
       <AppSkeleton height="150px" radius="var(--radius-lg)" />
       <AppSkeleton width="70%" height="20px" />
       <AppSkeleton width="45%" height="16px" />
     </div>
   </div>
-  <AppEmptyState v-else-if="items.length === 0" :title="emptyTitle" :description="emptyDescription"><slot name="empty" /></AppEmptyState>
+  <AppEmptyState v-else-if="items.length === 0" :title="emptyTitle" :description="emptyDescription"
+    ><slot name="empty"
+  /></AppEmptyState>
   <div v-else class="venue-list" :class="`venue-list--${layout}`">
     <VenueCard
       v-for="venue in items"
@@ -51,9 +58,33 @@ defineEmits<{ favorite: [venue: VenueListItem]; navigate: [venue: VenueListItem]
 </template>
 
 <style scoped>
-.venue-list { min-width: 0; display: grid; gap: var(--space-4); }
-.venue-list--horizontal { grid-auto-flow: column; grid-auto-columns: min(64vw, 236px); overflow-x: auto; margin-inline: calc(var(--space-4) * -1); padding-inline: var(--space-4); padding-bottom: var(--space-2); scroll-snap-type: x proximity; scrollbar-width: none; }
-.venue-list--horizontal > * { scroll-snap-align: start; }
-.venue-list--horizontal::-webkit-scrollbar { display: none; }
-.venue-list__skeleton { display: grid; gap: var(--space-3); padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); }
+.venue-list {
+  min-width: 0;
+  display: grid;
+  gap: var(--space-4);
+}
+.venue-list--horizontal {
+  grid-auto-flow: column;
+  grid-auto-columns: min(64vw, 236px);
+  overflow-x: auto;
+  margin-inline: calc(var(--space-4) * -1);
+  padding-inline: var(--space-4);
+  padding-bottom: var(--space-2);
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+}
+.venue-list--horizontal > * {
+  scroll-snap-align: start;
+}
+.venue-list--horizontal::-webkit-scrollbar {
+  display: none;
+}
+.venue-list__skeleton {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
 </style>

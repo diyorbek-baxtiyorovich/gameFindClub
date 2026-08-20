@@ -6,7 +6,7 @@ const props = withDefaults(
     modelValue?: string
     label: string
     id?: string
-    type?: 'text' | 'email' | 'tel' | 'url' | 'password' | 'number'
+    type?: 'text' | 'email' | 'tel' | 'url' | 'password' | 'number' | 'time'
     placeholder?: string
     hint?: string
     error?: string
@@ -16,6 +16,7 @@ const props = withDefaults(
     min?: number
     max?: number
     step?: number
+    maxlength?: number
   }>(),
   { modelValue: '', type: 'text', disabled: false, required: false },
 )
@@ -45,6 +46,7 @@ const inputId = props.id ?? generatedId
       :min="min"
       :max="max"
       :step="step"
+      :maxlength="maxlength"
       :aria-invalid="Boolean(error)"
       :aria-describedby="hint || error ? `${inputId}-message` : undefined"
       @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"

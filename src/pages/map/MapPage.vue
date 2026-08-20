@@ -22,6 +22,7 @@ import {
 import type { MapViewport } from '@/features/map'
 import { useFavoritesStore, useFiltersStore } from '@/stores'
 import { useSearchStore } from '@/features/search'
+import { t } from '@/i18n'
 
 const mapState = useMapStore()
 const filters = useFiltersStore()
@@ -74,8 +75,8 @@ watch(displayedVenues, (venues) => {
   <section class="map-page">
     <div class="map-page__top">
       <div class="map-page__search">
-        <AppSearchInput :model-value="search.query" placeholder="Joy yoki manzilni qidiring" @update:model-value="search.setQuery" />
-        <AppIconButton label="Filtrlarni ochish" @click="localFiltersOpen = true"><AppLucideIcon name="sliders" /></AppIconButton>
+        <AppSearchInput :model-value="search.query" :placeholder="t('home.search')" @update:model-value="search.setQuery" />
+        <AppIconButton :label="t('search.filters')" @click="localFiltersOpen = true"><AppLucideIcon name="sliders" /></AppIconButton>
       </div>
       <div class="map-page__categories"><CategorySelector :selected-id="filters.categoryId" include-all @select="selectCategory" /></div>
     </div>
@@ -95,20 +96,20 @@ watch(displayedVenues, (venues) => {
 
       <MapFloatingControls>
         <template #right>
-          <AppIconButton label="Filtrlarni ochish" @click="localFiltersOpen = true"><AppLucideIcon name="filter" /></AppIconButton>
-          <AppIconButton label="Joriy joylashuv" :loading="location.status === 'requesting'" @click="useCurrentLocation"><AppLucideIcon name="locate" /></AppIconButton>
+          <AppIconButton :label="t('search.filters')" @click="localFiltersOpen = true"><AppLucideIcon name="filter" /></AppIconButton>
+          <AppIconButton :label="t('map.current_location')" :loading="location.status === 'requesting'" @click="useCurrentLocation"><AppLucideIcon name="locate" /></AppIconButton>
         </template>
       </MapFloatingControls>
     </VenueMap>
 
-    <AppButton v-if="mapState.viewportDirty" class="map-page__search-area" :loading="mapState.loading" @click="searchCurrentArea">Shu hududdan qidirish</AppButton>
+    <AppButton v-if="mapState.viewportDirty" class="map-page__search-area" :loading="mapState.loading" @click="searchCurrentArea">{{ t('map.search_area') }}</AppButton>
 
     <p v-if="mapState.error" class="map-page__message" role="alert">{{ mapState.error }}</p>
-    <p v-else-if="mapState.hasSearched && displayedVenues.length === 0" class="map-page__message" role="status">Bu hududda joy topilmadi. Xaritani suring yoki kategoriyani tozalang.</p>
+    <p v-else-if="mapState.hasSearched && displayedVenues.length === 0" class="map-page__message" role="status">{{ t('map.empty') }}</p>
 
-    <aside v-if="selectedVenue" class="map-page__preview" aria-label="Tanlangan joy">
+    <aside v-if="selectedVenue" class="map-page__preview" :aria-label="t('map.selected')">
       <span class="map-page__handle" aria-hidden="true" />
-      <button type="button" class="map-page__preview-close" aria-label="Yopish" @click="mapState.selectVenue(null)"><AppLucideIcon name="x" /></button>
+      <button type="button" class="map-page__preview-close" :aria-label="t('common.close')" @click="mapState.selectVenue(null)"><AppLucideIcon name="x" /></button>
       <VenueMapPreviewCard :venue="selectedVenue" @favorite="favorites.toggle($event.id)" />
     </aside>
     <FilterBottomSheet v-model="localFiltersOpen" :result-count="displayedVenues.length" @apply="searchCurrentArea" />
@@ -119,6 +120,8 @@ watch(displayedVenues, (venues) => {
 .map-page { position: relative; height: calc(100vh - 84px - var(--safe-area-top) - var(--safe-area-bottom)); height: calc(100dvh - 84px - var(--safe-area-top) - var(--safe-area-bottom)); min-height: min(420px, calc(100dvh - 84px)); margin: 0 calc((var(--space-4) + var(--safe-area-right)) * -1) calc((var(--space-5) + var(--safe-area-bottom)) * -1) calc((var(--space-4) + var(--safe-area-left)) * -1); overflow: hidden; }
 .map-page__top { position:absolute;z-index:650;top:var(--space-3);right:var(--space-3);left:var(--space-3);display:grid;gap:var(--space-3);pointer-events:none }
 .map-page__search { display:grid;grid-template-columns:minmax(0,1fr) 48px;gap:var(--space-2);padding:var(--space-2);border:1px solid var(--color-border);border-radius:var(--radius-xl);background:color-mix(in srgb,var(--color-surface) 96%,transparent);box-shadow:var(--elevation-2);backdrop-filter:blur(12px);pointer-events:auto }
+.map-page__search > *{min-width:0}
+.map-page__search :deep(.app-search){min-width:0}
 .map-page__search :deep(.app-search__control){border:0;background:transparent}
 .map-page__categories { max-width: 100%; padding: var(--space-1) 0;pointer-events:auto }
 .map-page__search-area{position:absolute;z-index:620;top:150px;left:50%;transform:translateX(-50%);white-space:nowrap;box-shadow:var(--elevation-2)}

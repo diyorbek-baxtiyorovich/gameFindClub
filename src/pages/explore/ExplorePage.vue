@@ -13,6 +13,7 @@ import { ActiveFilterList, FilterBottomSheet, ResultCount } from '@/features/fil
 import { useGeolocationStore } from '@/features/geolocation'
 import { SortSheet, useSearchStore, useSortStore } from '@/features/search'
 import { useFavoritesStore, useFiltersStore, useVenuesStore } from '@/stores'
+import { t } from '@/i18n'
 
 const router = useRouter()
 const filters = useFiltersStore()
@@ -66,26 +67,26 @@ onBeforeUnmount(() => refreshTimer && clearTimeout(refreshTimer))
 
 <template>
   <section class="explore-page">
-    <AppSearchInput :model-value="search.query" placeholder="Search venues" @update:model-value="search.setQuery" @search="search.commitSearch" />
+    <AppSearchInput :model-value="search.query" :placeholder="t('search.placeholder')" @update:model-value="search.setQuery" @search="search.commitSearch" />
     <CategorySelector :selected-id="filters.categoryId" include-all @select="filters.setCategory" />
 
     <div class="explore-page__toolbar">
-      <AppButton variant="secondary" @click="filtersOpen = true"><template #leading><AppLucideIcon name="filter" :size="18" /></template>Filtrlar{{ filters.activeFilterCount ? ` (${filters.activeFilterCount})` : '' }}</AppButton>
-      <AppButton variant="secondary" @click="sortOpen = true"><template #leading><AppLucideIcon name="sliders" :size="18" /></template>Saralash</AppButton>
+      <AppButton variant="secondary" @click="filtersOpen = true"><template #leading><AppLucideIcon name="filter" :size="18" /></template>{{ t('search.filters') }}{{ filters.activeFilterCount ? ` (${filters.activeFilterCount})` : '' }}</AppButton>
+      <AppButton variant="secondary" @click="sortOpen = true"><template #leading><AppLucideIcon name="sliders" :size="18" /></template>{{ t('search.sort') }}</AppButton>
       <div class="explore-page__view" aria-label="Result view">
-        <AppButton size="sm"><template #leading><AppLucideIcon name="list" :size="18" /></template>List</AppButton>
-        <AppButton size="sm" variant="ghost" @click="router.push({ name: 'map' })"><template #leading><AppLucideIcon name="map" :size="18" /></template>Xarita</AppButton>
+        <AppButton size="sm"><template #leading><AppLucideIcon name="list" :size="18" /></template>{{ t('search.list') }}</AppButton>
+        <AppButton size="sm" variant="ghost" @click="router.push({ name: 'map' })"><template #leading><AppLucideIcon name="map" :size="18" /></template>{{ t('navigation.map') }}</AppButton>
       </div>
-      <AppButton variant="ghost" :loading="geolocation.status === 'requesting'" @click="requestNearby"><template #leading><AppLucideIcon name="locate" :size="18" /></template>Yaqin</AppButton>
+      <AppButton variant="ghost" :loading="geolocation.status === 'requesting'" @click="requestNearby"><template #leading><AppLucideIcon name="locate" :size="18" /></template>{{ t('search.nearby') }}</AppButton>
     </div>
 
-    <p v-if="geolocation.error" class="explore-page__notice" role="status">Location is unavailable. You can continue without it.</p>
+    <p v-if="geolocation.error" class="explore-page__notice" role="status">{{ t('search.location_unavailable') }}</p>
     <ActiveFilterList :filters="filters.activeFilters" @remove="filters.removeFilter" />
     <ResultCount :count="venues.items.length" :loading="venues.loading" />
 
     <VenueList v-if="venues.loading" :loading="true" card-variant="default" />
-    <AppErrorState v-else-if="venues.error" title="Could not load venues" :description="venues.error" @retry="refresh" />
-    <AppEmptyState v-else-if="venues.items.length === 0" title="No venues match your search" description="Reset filters and try a broader search." action-label="Reset filters" @action="resetNoResults" />
+    <AppErrorState v-else-if="venues.error" :title="t('search.load_error')" :description="venues.error" @retry="refresh" />
+    <AppEmptyState v-else-if="venues.items.length === 0" :title="t('search.no_results')" :description="t('search.no_results_description')" :action-label="t('filters.reset')" @action="resetNoResults" />
     <VenueList v-else :items="visibleItems" card-variant="default" @favorite="favorites.toggle($event.id)" />
 
     <FilterBottomSheet v-model="filtersOpen" :result-count="venues.items.length" />
@@ -96,8 +97,9 @@ onBeforeUnmount(() => refreshTimer && clearTimeout(refreshTimer))
 <style scoped>
 .explore-page { display: grid; gap: var(--space-4); padding-block: var(--space-3); }
 .explore-page :deep(.app-search__control) { min-height: 54px; border-radius: var(--radius-lg); }
-.explore-page__toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
-.explore-page__view { display: flex; margin-left: auto; padding: 3px; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface-muted); }
+.explore-page__toolbar { display: flex; flex-wrap: nowrap; align-items: center; gap: var(--space-2); overflow-x:auto;margin-inline:calc(var(--space-4) * -1);padding:0 var(--space-4) var(--space-1);scrollbar-width:none }
+.explore-page__toolbar::-webkit-scrollbar{display:none}
+.explore-page__toolbar > *{flex:0 0 auto}
+.explore-page__view { display: flex; padding: 3px; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface-muted); }
 .explore-page__notice { margin: 0; padding: var(--space-3); border-radius: var(--radius-md); color: var(--color-text-secondary); background: var(--color-surface-muted); font-size: var(--font-size-sm); }
-@media (max-width: 370px) { .explore-page__view { width: 100%; margin-left: 0; }.explore-page__view > * { flex: 1; } }
 </style>

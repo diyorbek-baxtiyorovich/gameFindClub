@@ -11,6 +11,7 @@ import { useSearchStore } from '@/features/search'
 import { useFiltersStore } from '@/stores'
 import { useFavoritesStore, useHistoryStore } from '@/stores'
 import type { VenueListItem } from '@/entities/venue'
+import { t } from '@/i18n'
 
 import { homeFixtureData } from './home.data'
 
@@ -42,16 +43,16 @@ const withFavoriteState = (items: readonly VenueListItem[]): readonly VenueListI
   <div class="home-page">
     <LocationSelector :cities="cities" />
     <div class="home-page__search">
-      <AppSearchInput :model-value="search.query" placeholder="Joy yoki faoliyatni qidiring" @update:model-value="search.setQuery" @search="openExplore" />
-      <AppIconButton class="home-page__filter" label="Filtrlarni ochish" @click="router.push({ name: 'explore' })"><AppLucideIcon name="sliders" /></AppIconButton>
+      <AppSearchInput :model-value="search.query" :placeholder="t('home.search')" @update:model-value="search.setQuery" @search="openExplore" />
+      <AppIconButton class="home-page__filter" :label="t('search.filters')" @click="router.push({ name: 'explore' })"><AppLucideIcon name="sliders" /></AppIconButton>
     </div>
 
     <CategorySelector :selected-id="filters.categoryId" @select="selectCategory" />
 
-    <VenueRail title="Yaqiningizda" :items="withFavoriteState(homeFixtureData.nearby)" action-label="Barchasi" @action="router.push({ name: 'explore' })" @favorite="favorites.toggle($event.id)" />
-    <VenueRail title="Siz uchun" layout="vertical" card-variant="horizontal" :items="withFavoriteState(homeFixtureData.recommended)" @favorite="favorites.toggle($event.id)" />
-    <VenueRail title="Maxsus to‘plamlar" layout="vertical" card-variant="horizontal" :items="withFavoriteState(homeFixtureData.specialCollections)" @favorite="favorites.toggle($event.id)" />
-    <VenueRail title="Yaqinda ko‘rilgan" layout="vertical" card-variant="horizontal" :items="withFavoriteState(history.items.length ? history.items : homeFixtureData.recentlyViewed)" @favorite="favorites.toggle($event.id)" />
+    <VenueRail :title="t('home.nearby')" :items="withFavoriteState(homeFixtureData.nearby)" :action-label="t('common.all')" @action="router.push({ name: 'explore' })" @favorite="favorites.toggle($event.id)" />
+    <VenueRail :title="t('home.for_you')" layout="vertical" card-variant="horizontal" :items="withFavoriteState(homeFixtureData.recommended)" @favorite="favorites.toggle($event.id)" />
+    <VenueRail :title="t('home.collections')" layout="vertical" card-variant="horizontal" :items="withFavoriteState(homeFixtureData.specialCollections)" @favorite="favorites.toggle($event.id)" />
+    <VenueRail :title="t('home.recent')" layout="vertical" card-variant="horizontal" :items="withFavoriteState(history.items.length ? history.items : homeFixtureData.recentlyViewed)" @favorite="favorites.toggle($event.id)" />
   </div>
 </template>
 

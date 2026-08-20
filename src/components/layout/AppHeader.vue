@@ -13,8 +13,27 @@ withDefaults(defineProps<{ title: string; showBackButton?: boolean }>(), { showB
 </template>
 
 <style scoped>
-.app-header { min-height: 56px; display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; gap: var(--space-2); }
-.app-header h1 { min-width: 0; margin: 0; overflow: hidden; text-align: center; text-overflow: ellipsis; white-space: nowrap; font-size: var(--font-size-lg); }
-.app-header__side { min-width: 44px; }
-.app-header__side--end { display: flex; justify-content: flex-end; }
+.app-header {
+  min-height: 56px;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: var(--space-2);
+}
+.app-header h1 {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--font-size-lg);
+}
+.app-header__side {
+  min-width: 44px;
+}
+.app-header__side--end {
+  display: flex;
+  justify-content: flex-end;
+}
 </style>

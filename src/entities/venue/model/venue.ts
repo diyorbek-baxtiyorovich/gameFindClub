@@ -69,6 +69,7 @@ export interface OpeningHours {
 
 export interface ContactInfo {
   phone?: string
+  secondaryPhone?: string
   email?: string
   websiteUrl?: string
   bookingUrl?: string

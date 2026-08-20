@@ -5,8 +5,8 @@ import type { GeoPoint } from '@/entities/venue/model/venue'
 import type { MapViewport } from '../map.types'
 import { MAP_LAYER_CONTEXT } from './map.context'
 
-const props = withDefaults(defineProps<{ center?: GeoPoint; zoom?: number }>(), { center: () => ({ latitude: 41.3111, longitude: 69.2797 }), zoom: 12 })
-const emit = defineEmits<{ viewportChange: [viewport: MapViewport]; ready: [] }>()
+const props = withDefaults(defineProps<{ center?: GeoPoint; zoom?: number; selectable?: boolean }>(), { center: () => ({ latitude: 41.3111, longitude: 69.2797 }), zoom: 12, selectable: false })
+const emit = defineEmits<{ viewportChange: [viewport: MapViewport]; ready: []; pointSelect: [point: GeoPoint] }>()
 const container = ref<HTMLElement>()
 const map = shallowRef<L.Map | null>(null)
 const target = shallowRef<L.Map | L.LayerGroup | null>(null)
@@ -30,6 +30,11 @@ function emitViewport(): void {
   }, 300)
 }
 
+function selectPoint(event: L.LeafletMouseEvent): void {
+  if (!props.selectable) return
+  emit('pointSelect', { latitude: event.latlng.lat, longitude: event.latlng.lng })
+}
+
 onMounted(async () => {
   await nextTick()
   if (!container.value) return
@@ -40,6 +45,7 @@ onMounted(async () => {
   }).addTo(map.value)
   target.value = map.value
   map.value.on('moveend zoomend', emitViewport)
+  map.value.on('click', selectPoint)
   ready.value = true
   emit('ready')
   emitViewport()
@@ -50,6 +56,7 @@ watch(() => props.center, (center) => map.value?.flyTo([center.latitude, center.
 onBeforeUnmount(() => {
   if (moveTimer) clearTimeout(moveTimer)
   map.value?.off('moveend zoomend', emitViewport)
+  map.value?.off('click', selectPoint)
   map.value?.remove()
   map.value = null
   target.value = null
@@ -58,4 +65,4 @@ onBeforeUnmount(() => {
 
 <template><div class="venue-map"><div ref="container" class="venue-map__canvas" /><slot v-if="ready" /></div></template>
 
-<style scoped>.venue-map, .venue-map__canvas { width: 100%; height: 100%; min-height: 360px; }.venue-map { position: relative; overflow: hidden; background: var(--color-surface-muted); }</style>
+<style scoped>.venue-map, .venue-map__canvas { width: 100%; height: 100%; min-height: 360px; }.venue-map { position: relative; overflow: hidden; background: var(--color-surface-muted); }.venue-map:has(.venue-map__canvas) { touch-action: pan-x pan-y; }</style>
