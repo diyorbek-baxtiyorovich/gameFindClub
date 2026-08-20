@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 
 import AppButton from '@/components/ui/AppButton.vue'
-import AppModal from '@/components/ui/AppModal.vue'
 import { CategorySelector } from '@/entities/category'
 import type { VenueEditorDraft } from '@/features/owner/venue-editor'
 import { t } from '@/i18n'
@@ -26,6 +25,10 @@ function confirmCategoryChange(): void {
   draftStore.setCategory(pendingCategoryId.value, true)
   pendingCategoryId.value = null
 }
+
+function cancelCategoryChange(): void {
+  pendingCategoryId.value = null
+}
 </script>
 
 <template>
@@ -34,22 +37,28 @@ function confirmCategoryChange(): void {
       <h3>{{ t('owner.editor.category.title') }}</h3>
       <p>{{ t('owner.editor.category.description') }}</p>
     </div>
-    <CategorySelector :selected-id="draft.categoryId" @select="selectCategory" />
+    <CategorySelector :selected-id="pendingCategoryId ?? draft.categoryId" @select="selectCategory" />
     <p v-if="!draft.categoryId" class="category-step__error" role="alert">{{ t('owner.editor.validation.category_required') }}</p>
 
-    <AppModal :model-value="Boolean(pendingCategoryId)" :title="t('owner.editor.category.change_title')" :close-label="t('common.close')" @update:model-value="(open) => { if (!open) pendingCategoryId = null }">
-      <p class="category-step__warning">{{ t('owner.editor.category.change_warning') }}</p>
-      <template #footer>
-        <AppButton variant="secondary" @click="pendingCategoryId = null">{{ t('owner.action.cancel') }}</AppButton>
+    <section v-if="pendingCategoryId" class="category-step__confirmation" role="alert">
+      <div>
+        <strong>{{ t('owner.editor.category.change_title') }}</strong>
+        <p>{{ t('owner.editor.category.change_warning') }}</p>
+      </div>
+      <div class="category-step__actions">
+        <AppButton variant="secondary" @click="cancelCategoryChange">{{ t('owner.action.cancel') }}</AppButton>
         <AppButton @click="confirmCategoryChange">{{ t('owner.editor.category.change_confirm') }}</AppButton>
-      </template>
-    </AppModal>
+      </div>
+    </section>
   </div>
 </template>
 
 <style scoped>
 .category-step { display: grid; gap: var(--space-5); }
 .category-step h3, .category-step p { margin: 0; }
-.category-step > div > p, .category-step__warning { margin-top: var(--space-2); color: var(--color-text-secondary); }
+.category-step > div > p, .category-step__confirmation p { margin-top: var(--space-2); color: var(--color-text-secondary); }
 .category-step__error { color: var(--color-danger); font-size: var(--font-size-sm); }
+.category-step__confirmation { display: grid; gap: var(--space-3); padding: var(--space-4); border: 1px solid var(--color-warning); border-radius: var(--radius-xl); background: var(--color-warning-soft); }
+.category-step__actions { display: flex; justify-content: flex-end; gap: var(--space-2); }
+@media (max-width: 350px) { .category-step__actions { grid-template-columns: 1fr; display: grid; } }
 </style>

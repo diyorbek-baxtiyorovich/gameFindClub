@@ -37,8 +37,9 @@ useTelegramBackButton(handleTelegramBack, showHeader)
           <small>{{ t('owner.workspace') }}</small>
           <h1>{{ title }}</h1>
         </div>
-        <button type="button" :aria-label="t('owner.back_to_user')" @click="exitOwnerWorkspace">
+        <button class="owner-layout__exit" type="button" :aria-label="t('owner.back_to_user_mode')" @click="exitOwnerWorkspace">
           <AppLucideIcon name="user" :size="22" />
+          <span>{{ t('owner.user_mode') }}</span>
         </button>
       </slot>
     </header>
@@ -83,20 +84,30 @@ useTelegramBackButton(handleTelegramBack, showHeader)
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.owner-layout__header button {
-  width: var(--touch-target-min);
+.owner-layout__exit {
+  min-width: var(--touch-target-min);
   height: var(--touch-target-min);
-  display: grid;
+  display: flex;
   place-items: center;
+  align-items: center;
+  gap: var(--space-2);
+  padding-inline: var(--space-3);
   flex: 0 0 auto;
   border: 1px solid var(--color-border);
-  border-radius: 50%;
+  border-radius: var(--radius-pill);
   color: var(--color-primary);
   background: var(--color-surface);
   cursor: pointer;
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
 }
 .owner-layout__content {
   min-width: 0;
   padding-top: var(--space-5);
+}
+@media (max-width: 350px) {
+  .owner-layout__exit { width: var(--touch-target-min); padding: 0; justify-content: center; }
+  .owner-layout__exit span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 }
 </style>

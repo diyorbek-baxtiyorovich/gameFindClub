@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import AppButton from '@/components/ui/AppButton.vue'
 import AppLucideIcon from '@/components/ui/AppLucideIcon.vue'
 import type { VenueMedia } from '@/entities/venue'
 import type { VenueEditorDraft } from '@/features/owner/venue-editor'
@@ -55,10 +54,15 @@ function move(index: number, direction: -1 | 1): void {
 <template>
   <div class="media-step">
     <input ref="fileInput" class="media-step__input" type="file" accept="image/jpeg,image/png,image/webp" multiple @change="selectFiles" />
-    <AppButton variant="secondary" @click="chooseFiles">
-      <template #leading><AppLucideIcon name="plus" /></template>
-      {{ t('owner.editor.media.choose') }}
-    </AppButton>
+    <header>
+      <h3>{{ t('owner.editor.media.title') }}</h3>
+      <p>{{ t('owner.editor.media.description') }}</p>
+    </header>
+    <button class="media-step__picker" type="button" @click="chooseFiles">
+      <span><AppLucideIcon name="image" :size="24" /></span>
+      <strong>{{ t('owner.editor.media.choose') }}</strong>
+      <small>{{ t('owner.editor.media.formats') }}</small>
+    </button>
     <p class="media-step__notice">{{ t('owner.editor.media.local_notice') }}</p>
     <ul v-if="errors.length" class="media-step__errors" role="alert">
       <li v-for="error in errors" :key="`${error.fileName}-${error.code}`">{{ error.fileName }} — {{ error.code === 'file-too-large' ? t('owner.editor.media.too_large') : t('owner.editor.media.unsupported') }}</li>
@@ -83,7 +87,11 @@ function move(index: number, direction: -1 | 1): void {
 <style scoped>
 .media-step { display: grid; gap: var(--space-4); }
 .media-step__input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-.media-step > :deep(.app-button) { justify-self: start; }
+.media-step header h3, .media-step header p { margin: 0; }
+.media-step header p { margin-top: var(--space-1); color: var(--color-text-secondary); font-size: var(--font-size-sm); }
+.media-step__picker { min-height: 132px; display: grid; place-items: center; align-content: center; gap: var(--space-2); padding: var(--space-4); border: 1px dashed var(--color-border-strong); border-radius: var(--radius-xl); color: var(--color-text); background: var(--color-surface-muted); cursor: pointer; font: inherit; text-align: center; }
+.media-step__picker span { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; color: var(--color-primary); background: var(--color-primary-soft); }
+.media-step__picker small { color: var(--color-text-secondary); }
 .media-step__notice, .media-step__empty { margin: 0; color: var(--color-text-secondary); font-size: var(--font-size-sm); }
 .media-step__errors { margin: 0; padding-left: var(--space-5); color: var(--color-danger); font-size: var(--font-size-sm); }
 .media-step__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }

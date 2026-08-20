@@ -3,14 +3,25 @@ import type { VenueEditorDraft } from '@/features/owner/venue-editor'
 import type { OwnerVenueDraftRepository } from '../owner-venue-draft.repository'
 import { createOwnerLocalStorage, OWNER_STORAGE_KEYS } from './owner-local.storage'
 
-const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null
-const isVenueEditorDraft = (value: unknown): value is VenueEditorDraft => isRecord(value)
-  && typeof value.key === 'string' && (value.mode === 'create' || value.mode === 'edit')
-  && typeof value.ownerId === 'string' && typeof value.name === 'string'
-  && typeof value.shortDescription === 'string' && typeof value.description === 'string'
-  && isRecord(value.categoryAttributes) && isRecord(value.address) && isRecord(value.coordinates)
-  && Array.isArray(value.media) && Array.isArray(value.activities) && Array.isArray(value.facilities)
-  && Array.isArray(value.amenities) && Array.isArray(value.resources) && Array.isArray(value.pricing)
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null
+const isVenueEditorDraft = (value: unknown): value is VenueEditorDraft =>
+  isRecord(value) &&
+  typeof value.key === 'string' &&
+  (value.mode === 'create' || value.mode === 'edit') &&
+  typeof value.ownerId === 'string' &&
+  typeof value.name === 'string' &&
+  typeof value.shortDescription === 'string' &&
+  typeof value.description === 'string' &&
+  isRecord(value.categoryAttributes) &&
+  isRecord(value.address) &&
+  isRecord(value.coordinates) &&
+  Array.isArray(value.media) &&
+  Array.isArray(value.activities) &&
+  Array.isArray(value.facilities) &&
+  Array.isArray(value.amenities) &&
+  Array.isArray(value.resources) &&
+  Array.isArray(value.pricing)
 const isVenueEditorDraftArray = (value: unknown): value is VenueEditorDraft[] =>
   Array.isArray(value) && value.every(isVenueEditorDraft)
 

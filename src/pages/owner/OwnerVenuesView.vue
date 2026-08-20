@@ -12,6 +12,7 @@ import AppModal from '@/components/ui/AppModal.vue'
 import AppSearchInput from '@/components/ui/AppSearchInput.vue'
 import AppSkeleton from '@/components/ui/AppSkeleton.vue'
 import {
+  type CreateVenueInput,
   getVenueStatusPresentation,
   OWNER_VENUE_STATUS_FILTERS,
   type VenueStatus,
@@ -61,6 +62,29 @@ async function confirmDelete(): Promise<void> {
   if (!deleteCandidate.value) return
   const deleted = await venues.remove(deleteCandidate.value.id)
   if (deleted) deleteCandidate.value = null
+}
+
+async function duplicateVenue(venue: OwnerVenue): Promise<void> {
+  const input: CreateVenueInput = {
+    ownerId: venue.ownerId,
+    name: t('owner.venue.copy_name', { name: venue.name || t('owner.venue.untitled') }),
+    category: venue.category,
+    categoryAttributes: venue.categoryAttributes,
+    shortDescription: venue.shortDescription,
+    description: venue.description,
+    address: venue.address,
+    location: venue.location,
+    coverMedia: venue.coverMedia,
+    media: venue.media,
+    contacts: venue.contacts,
+    schedule: venue.schedule,
+    activities: venue.activities,
+    facilities: venue.facilities,
+    amenities: venue.amenities,
+    resources: venue.resources,
+    pricing: venue.pricing,
+  }
+  await venues.create(input)
 }
 
 onMounted(() => venues.load())
@@ -117,10 +141,12 @@ onMounted(() => venues.load())
         :allow-view="venue.status === 'approved' && Boolean(venue.slug)"
         :allow-archive="venue.status !== 'draft' && venue.status !== 'archived'"
         :allow-delete="venue.status === 'draft'"
+        allow-duplicate
         @edit="editVenue(venue)"
         @view="viewVenue(venue)"
         @archive="venues.archive(venue.id)"
         @delete="deleteCandidate = venue"
+        @duplicate="duplicateVenue(venue)"
       />
     </div>
 

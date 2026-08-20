@@ -43,9 +43,9 @@ const averageRating = computed(() =>
   analytics.summary?.averageRating == null ? null : analytics.summary.averageRating.toFixed(1),
 )
 const quickActions = [
-  { routeName: 'owner-venue-new', label: () => t('owner.action.add_venue'), icon: 'plus' },
-  { routeName: 'owner-venues', label: () => t('owner.action.manage_venues'), icon: 'list' },
-  { routeName: 'owner-reviews', label: () => t('owner.action.view_reviews'), icon: 'message' },
+  { routeName: 'owner-venue-new', label: () => t('owner.action.add_venue'), icon: 'plus', primary: true },
+  { routeName: 'owner-venues', label: () => t('owner.action.manage_venues'), icon: 'list', primary: false },
+  { routeName: 'owner-reviews', label: () => t('owner.action.view_reviews'), icon: 'message', primary: false },
 ] as const
 
 async function loadDashboard(): Promise<void> {
@@ -58,9 +58,10 @@ onMounted(loadDashboard)
 <template>
   <div class="owner-dashboard">
     <section class="owner-dashboard__greeting">
-      <span>{{ t('owner.dashboard.greeting') }}</span>
-      <h2>{{ session.profile.displayName }}</h2>
+      <span class="owner-dashboard__greeting-icon"><AppLucideIcon name="building" :size="22" /></span>
+      <div><h2>{{ t('owner.dashboard.greeting_named', { name: session.profile.displayName }) }}</h2>
       <p>{{ t('owner.dashboard.subtitle') }}</p>
+      </div>
     </section>
 
     <div
@@ -110,7 +111,8 @@ onMounted(loadDashboard)
           <AppButton
             v-for="action in quickActions"
             :key="action.routeName"
-            variant="secondary"
+            :variant="action.primary ? 'primary' : 'secondary'"
+            :class="{ 'owner-dashboard__action--primary': action.primary }"
             @click="router.push({ name: action.routeName })"
           >
             <template #leading><AppLucideIcon :name="action.icon" /></template>
@@ -161,29 +163,18 @@ onMounted(loadDashboard)
   display: grid;
   gap: var(--space-6);
 }
-.owner-dashboard__greeting {
-  padding: var(--space-5);
-  border-radius: var(--radius-xl);
-  color: var(--color-text-inverse);
-  background: linear-gradient(
-    135deg,
-    var(--color-primary),
-    color-mix(in srgb, var(--color-primary) 65%, var(--color-success))
-  );
-}
-.owner-dashboard__greeting span {
-  font-size: var(--font-size-sm);
-  opacity: 0.85;
-}
+.owner-dashboard__greeting { display:grid;grid-template-columns:44px minmax(0,1fr);align-items:center;gap:var(--space-3);padding:var(--space-4);border:1px solid var(--color-border);border-radius:var(--radius-xl);background:var(--color-surface);box-shadow:var(--elevation-1) }
+.owner-dashboard__greeting-icon{width:44px;height:44px;display:grid;place-items:center;border-radius:var(--radius-lg);color:var(--color-primary);background:var(--color-primary-soft)}
 .owner-dashboard__greeting h2 {
-  margin: var(--space-1) 0;
+  margin: 0;
   overflow: hidden;
   font-size: var(--font-size-xl);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .owner-dashboard__greeting p {
-  margin: 0;
+  margin: var(--space-1) 0 0;
+  color:var(--color-text-secondary);
   font-size: var(--font-size-sm);
   opacity: 0.9;
 }
@@ -199,7 +190,7 @@ onMounted(loadDashboard)
 }
 .owner-dashboard__actions {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-2);
 }
 .owner-dashboard__actions :deep(.app-button) {
@@ -210,6 +201,7 @@ onMounted(loadDashboard)
   color: var(--color-primary);
   font-size: var(--font-size-xs);
 }
+.owner-dashboard__actions :deep(.owner-dashboard__action--primary){grid-column:1/-1;min-height:54px;flex-direction:row;color:var(--color-text-inverse)}
 .owner-dashboard__actions :deep(.app-button span:last-child) {
   overflow: hidden;
   text-overflow: ellipsis;

@@ -10,7 +10,35 @@ export type {
   VenueEditorDraftCoordinates,
 } from './venue-editor-draft'
 export { areCategoryFieldsValid, isCategoryFieldValueValid } from './category-field-validation'
-export { createDefaultOpeningHours, isOpeningHoursValid, normalizeOpeningHours, WEEKDAYS } from './working-hours'
-export { areContactsValid, isValidInstagram, isValidPhone, isValidTelegram, isValidWebUrl } from './contact-validation'
-export { isMediaDraftValid, isPricingOptionValid, isPricingValid, isScheduleSubmissionReady, isVenueEditorStepValid, validateBasicInformation, validateContacts, validateLocation, validatePricingOption, validateVenueSubmission, VENUE_VALIDATION_LIMITS } from './venue-validation'
-export type { SubmissionIssue, VenueBasicField, VenueContactField, VenueLocationField } from './venue-validation'
+export {
+  createDefaultOpeningHours,
+  isOpeningHoursValid,
+  normalizeOpeningHours,
+  WEEKDAYS,
+} from './working-hours'
+export {
+  areContactsValid,
+  isValidInstagram,
+  isValidPhone,
+  isValidTelegram,
+  isValidWebUrl,
+} from './contact-validation'
+export {
+  isMediaDraftValid,
+  isPricingOptionValid,
+  isPricingValid,
+  isScheduleSubmissionReady,
+  isVenueEditorStepValid,
+  validateBasicInformation,
+  validateContacts,
+  validateLocation,
+  validatePricingOption,
+  validateVenueSubmission,
+  VENUE_VALIDATION_LIMITS,
+} from './venue-validation'
+export type {
+  SubmissionIssue,
+  VenueBasicField,
+  VenueContactField,
+  VenueLocationField,
+} from './venue-validation'

@@ -8,8 +8,9 @@ const props = withDefaults(
     title: string
     closeLabel?: string
     closeOnBackdrop?: boolean
+    placement?: 'center' | 'bottom'
   }>(),
-  { closeLabel: 'Close', closeOnBackdrop: true },
+  { closeLabel: 'Close', closeOnBackdrop: true, placement: 'center' },
 )
 const emit = defineEmits<{ 'update:modelValue': [value: boolean]; close: [] }>()
 const titleId = useId()
@@ -51,7 +52,7 @@ onBeforeUnmount(() => {
 <template>
   <Teleport to="body">
     <Transition name="app-modal">
-      <div v-if="modelValue" class="app-modal" @mousedown.self="closeOnBackdrop && close()">
+      <div v-if="modelValue" class="app-modal" :class="`app-modal--${placement}`" @mousedown.self="closeOnBackdrop && close()">
         <section
           class="app-modal__panel"
           role="dialog"
@@ -100,6 +101,8 @@ onBeforeUnmount(() => {
   background: var(--color-surface-raised);
   box-shadow: var(--elevation-2);
 }
+.app-modal--bottom { align-items: end; padding-bottom: 0; }
+.app-modal--bottom .app-modal__panel { width: min(100%, var(--content-max-width)); max-height: min(88dvh, 720px); border-radius: var(--radius-xl) var(--radius-xl) 0 0; border-bottom: 0; }
 .app-modal__header {
   min-height: 56px;
   display: flex;

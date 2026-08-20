@@ -19,6 +19,12 @@ export type VenueDraftSaveState = 'idle' | 'saving' | 'saved' | 'error'
 
 const AUTOSAVE_DELAY_MS = 650
 
+function cloneDraft(value: VenueEditorDraft): VenueEditorDraft {
+  // VenueEditorDraft is deliberately JSON-safe. JSON serialization unwraps every
+  // nested Vue Proxy, while structuredClone(toRaw(value)) only unwraps the root.
+  return JSON.parse(JSON.stringify(value)) as VenueEditorDraft
+}
+
 function draftFromVenue(venue: OwnerVenue): VenueEditorDraft {
   const now = new Date().toISOString()
   return {
@@ -103,7 +109,10 @@ export const useOwnerVenueDraftStore = defineStore('owner-venue-draft', () => {
 
   function mutate(update: (current: VenueEditorDraft) => VenueEditorDraft): void {
     if (!draft.value) return
-    draft.value = { ...update(structuredClone(draft.value)), updatedAt: new Date().toISOString() }
+    // Every setter below is immutable, so UI updates do not need a deep clone.
+    // Keeping cloning out of the input path also means persistence can never
+    // prevent a checkbox, price, or media selection from updating on screen.
+    draft.value = { ...update(draft.value), updatedAt: new Date().toISOString() }
     revision += 1
     error.value = null
     saveState.value = 'idle'
@@ -185,7 +194,14 @@ export const useOwnerVenueDraftStore = defineStore('owner-venue-draft', () => {
     saveTimer = undefined
     if (activeSave) await activeSave
     if (!draft.value || revision === savedRevision) return
-    const snapshot = structuredClone(draft.value)
+    let snapshot: VenueEditorDraft
+    try {
+      snapshot = cloneDraft(draft.value)
+    } catch (caught) {
+      error.value = caught instanceof Error ? caught.message : 'Unable to prepare the venue draft for saving.'
+      saveState.value = 'error'
+      return
+    }
     const savingRevision = revision
     saveState.value = 'saving'
     activeSave = (async () => {

@@ -16,11 +16,13 @@ const props = withDefaults(defineProps<{
   allowView?: boolean
   allowArchive?: boolean
   allowDelete?: boolean
+  allowDuplicate?: boolean
 }>(), {
   variant: 'default',
   allowView: false,
   allowArchive: false,
   allowDelete: false,
+  allowDuplicate: false,
 })
 
 const emit = defineEmits<{
@@ -28,6 +30,7 @@ const emit = defineEmits<{
   view: []
   archive: []
   delete: []
+  duplicate: []
 }>()
 const menuOpen = ref(false)
 const categoryLabel = computed(() => {
@@ -35,10 +38,11 @@ const categoryLabel = computed(() => {
   return t(category.label.key as MessageKey)
 })
 
-function run(action: 'view' | 'archive' | 'delete'): void {
+function run(action: 'view' | 'archive' | 'delete' | 'duplicate'): void {
   menuOpen.value = false
   if (action === 'view') emit('view')
   else if (action === 'archive') emit('archive')
+  else if (action === 'duplicate') emit('duplicate')
   else emit('delete')
 }
 </script>
@@ -61,15 +65,17 @@ function run(action: 'view' | 'archive' | 'delete'): void {
         <span v-if="venue.rating"><AppLucideIcon name="star" :size="15" filled />{{ venue.rating.average.toFixed(1) }}</span>
         <time :datetime="venue.updatedAt">{{ t('owner.venue.updated', { date: new Date(venue.updatedAt).toLocaleDateString() }) }}</time>
       </div>
+      <p v-if="variant === 'default' && (venue.status === 'rejected' || venue.status === 'changes_requested')" class="owner-venue-card__status-note">{{ venue.moderationNote || t(venue.status === 'rejected' ? 'owner.status.rejected_description' : 'owner.status.changes_requested_description') }}</p>
       <div class="owner-venue-card__actions">
         <AppButton size="sm" variant="secondary" @click="$emit('edit')">
           <template #leading><AppLucideIcon name="settings" :size="18" /></template>
           {{ t('owner.action.edit') }}
         </AppButton>
-        <div v-if="allowView || allowArchive || allowDelete" class="owner-venue-card__more">
+        <div v-if="allowView || allowArchive || allowDelete || allowDuplicate" class="owner-venue-card__more">
           <button type="button" :aria-label="t('owner.action.more')" aria-haspopup="menu" :aria-expanded="menuOpen" @click="menuOpen = !menuOpen"><AppLucideIcon name="more" /></button>
           <div v-if="menuOpen" class="owner-venue-card__menu" role="menu">
             <button v-if="allowView" type="button" role="menuitem" @click="run('view')">{{ t('owner.action.view') }}</button>
+            <button v-if="allowDuplicate" type="button" role="menuitem" @click="run('duplicate')">{{ t('owner.action.duplicate') }}</button>
             <button v-if="allowArchive" type="button" role="menuitem" @click="run('archive')">{{ t('owner.action.archive') }}</button>
             <button v-if="allowDelete" type="button" role="menuitem" class="owner-venue-card__delete" @click="run('delete')">{{ t('owner.action.delete') }}</button>
           </div>
@@ -91,6 +97,7 @@ function run(action: 'view' | 'archive' | 'delete'): void {
 .owner-venue-card__heading :deep(.app-badge) { flex: 0 0 auto; }
 .owner-venue-card__meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
 .owner-venue-card__meta span { display: inline-flex; align-items: center; gap: var(--space-1); color: var(--color-warning); }
+.owner-venue-card__status-note{margin:0;padding:var(--space-2);border-radius:var(--radius-md);color:var(--color-warning);background:var(--color-warning-soft);font-size:var(--font-size-xs);line-height:1.4}
 .owner-venue-card__actions { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
 .owner-venue-card__more { position: relative; margin-left: auto; }
 .owner-venue-card__more > button { width: var(--touch-target-min); height: var(--touch-target-min); display: grid; place-items: center; border: 0; border-radius: var(--radius-md); color: var(--color-text-secondary); background: transparent; cursor: pointer; }

@@ -1,7 +1,13 @@
 import type { DailyOpeningHours, OpeningHours, OpeningPeriod, Weekday } from '@/entities/venue'
 
 export const WEEKDAYS: readonly Weekday[] = [
-  'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+  'sunday',
 ]
 
 export const DEFAULT_OPENING_PERIOD: OpeningPeriod = { opensAt: '09:00', closesAt: '18:00' }
@@ -13,8 +19,10 @@ export function createDefaultOpeningHours(): OpeningHours {
 export function normalizeOpeningHours(schedule?: OpeningHours): OpeningHours {
   return {
     ...schedule,
-    weekly: WEEKDAYS.map((day) => schedule?.weekly.find((item) => item.day === day)
-      ?? { day, isClosed: true, periods: [] }),
+    weekly: WEEKDAYS.map(
+      (day) =>
+        schedule?.weekly.find((item) => item.day === day) ?? { day, isClosed: true, periods: [] },
+    ),
   }
 }
 
@@ -25,8 +33,12 @@ export function isValidTime(value: string): boolean {
 export function isDailyOpeningHoursValid(day: DailyOpeningHours): boolean {
   if (day.isClosed || day.isOpen24Hours) return true
   const period = day.periods?.[0]
-  return Boolean(period && isValidTime(period.opensAt) && isValidTime(period.closesAt)
-    && period.opensAt !== period.closesAt)
+  return Boolean(
+    period &&
+      isValidTime(period.opensAt) &&
+      isValidTime(period.closesAt) &&
+      period.opensAt !== period.closesAt,
+  )
 }
 
 export function isOpeningHoursValid(schedule?: OpeningHours): boolean {

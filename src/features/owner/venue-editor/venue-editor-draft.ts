@@ -51,7 +51,9 @@ export interface VenueEditorDraft {
   updatedAt: string
 }
 
-export type VenueBasicInformationErrors = Partial<Record<'name' | 'shortDescription' | 'description', string>>
+export type VenueBasicInformationErrors = Partial<
+  Record<'name' | 'shortDescription' | 'description', string>
+>
 
 export function createEmptyVenueEditorDraft(ownerId: string): VenueEditorDraft {
   const now = new Date().toISOString()

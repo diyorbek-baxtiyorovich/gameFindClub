@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import AppLucideIcon from '@/components/ui/AppLucideIcon.vue'
+import AppButton from '@/components/ui/AppButton.vue'
 import AppModal from '@/components/ui/AppModal.vue'
 import AppRadio from '@/components/ui/AppRadio.vue'
 import AppSwitch from '@/components/ui/AppSwitch.vue'
@@ -18,7 +19,7 @@ const location = useGeolocationStore()
 const user = telegram.user
 const displayName = computed(() => user ? [user.first_name, user.last_name].filter(Boolean).join(' ') : t('profile.guest'))
 const initials = computed(() => displayName.value.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase())
-const locationLabel = computed(() => location.manualLocation.district || location.manualLocation.city || (location.hasLocation ? t('profile.current_location') : 'Toshkent'))
+const locationLabel = computed(() => location.manualLocation.district || location.manualLocation.city || (location.hasLocation ? t('profile.current_location') : t('profile.default_city')))
 const darkMode = ref(document.documentElement.dataset.theme === 'dark')
 const languageModalOpen = ref(false)
 const { locale, setLocale } = useLocale()
@@ -57,13 +58,13 @@ async function openOwnerWorkspace(): Promise<void> {
       </div>
     </section>
 
-    <nav class="profile-links" aria-label="Profil bo‘limlari">
+    <nav class="profile-links" :aria-label="t('profile.sections_label')">
       <RouterLink :to="{ name: 'favorites' }"><AppLucideIcon name="heart" /><strong>{{ t('profile.saved') }}</strong><AppLucideIcon name="chevron-right" /></RouterLink>
       <RouterLink :to="{ name: 'reviews' }"><AppLucideIcon name="message" /><strong>{{ t('profile.my_reviews') }}</strong><AppLucideIcon name="chevron-right" /></RouterLink>
       <RouterLink :to="{ name: 'history' }"><AppLucideIcon name="history" /><strong>{{ t('profile.history') }}</strong><AppLucideIcon name="chevron-right" /></RouterLink>
     </nav>
 
-    <section id="profile-settings" class="profile-settings" aria-label="Sozlamalar">
+    <section id="profile-settings" class="profile-settings" :aria-label="t('profile.settings_label')">
       <button type="button" :disabled="location.status === 'requesting'" @click="location.requestLocation">
         <AppLucideIcon name="map-pin" /><strong>{{ t('profile.location') }}</strong><span>{{ location.status === 'requesting' ? t('profile.detecting') : locationLabel }}</span><AppLucideIcon name="chevron-right" />
       </button>
@@ -77,8 +78,11 @@ async function openOwnerWorkspace(): Promise<void> {
       <button type="button"><AppLucideIcon name="bell" /><strong>{{ t('profile.notifications') }}</strong><span /><AppLucideIcon name="chevron-right" /></button>
     </section>
 
-    <button class="owner-entry" type="button" :disabled="!ownerSession.temporaryModeAvailable" @click="openOwnerWorkspace"><AppLucideIcon name="plus" /><span>{{ t('owner.open_workspace') }}</span></button>
-    <small v-if="ownerSession.temporaryModeAvailable" class="owner-entry-notice">{{ t('owner.temporary_notice') }}</small>
+    <section class="business-entry" :aria-label="t('profile.business_title')">
+      <span class="business-entry__icon"><AppLucideIcon name="building" :size="24" /></span>
+      <div><small>{{ t('profile.business_title') }}</small><h2>{{ t('profile.business_manage_title') }}</h2><p>{{ t('profile.business_manage_description') }}</p></div>
+      <AppButton full-width :disabled="!ownerSession.temporaryModeAvailable" @click="openOwnerWorkspace">{{ t('profile.business_open_owner') }}<template #trailing><AppLucideIcon name="chevron-right" :size="18" /></template></AppButton>
+    </section>
 
     <AppModal v-model="languageModalOpen" :title="t('profile.select_language')" :close-label="t('common.close')">
       <div class="language-options">
@@ -115,9 +119,9 @@ async function openOwnerWorkspace(): Promise<void> {
 .profile-settings button > span { max-width: 120px; overflow: hidden; color: var(--color-text-secondary); text-overflow: ellipsis; white-space: nowrap; }
 .profile-settings__row :deep(.app-switch) { min-height: auto; justify-self: end; }
 .profile-settings__row :deep(.app-switch > span:first-child) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-.owner-entry { min-height: 72px; display: flex; align-items: center; justify-content: center; gap: var(--space-2); border: 1px dashed var(--color-border-strong); border-radius: var(--radius-xl); color: var(--color-primary); background: transparent; font: inherit; font-size: var(--font-size-lg); font-weight: var(--font-weight-semibold); opacity: .9; }
-.owner-entry:disabled { cursor: not-allowed; opacity: .5; }
-.owner-entry-notice { margin-top: calc(var(--space-3) * -1); color: var(--color-text-secondary); text-align: center; }
+.business-entry { display: grid; grid-template-columns: 44px minmax(0,1fr); gap: var(--space-3); padding: var(--space-4); border: 1px solid color-mix(in srgb,var(--color-primary) 30%,var(--color-border)); border-radius: var(--radius-xl); background: linear-gradient(145deg,var(--color-surface),color-mix(in srgb,var(--color-primary-soft) 55%,var(--color-surface))); box-shadow: var(--elevation-1); }
+.business-entry__icon { width:44px;height:44px;display:grid;place-items:center;border-radius:var(--radius-lg);color:var(--color-primary);background:var(--color-primary-soft) }
+.business-entry div{min-width:0}.business-entry small{color:var(--color-primary);font-weight:var(--font-weight-semibold)}.business-entry h2,.business-entry p{margin:0}.business-entry h2{margin-top:2px;font-size:var(--font-size-lg)}.business-entry p{margin-top:var(--space-1);color:var(--color-text-secondary);font-size:var(--font-size-sm);line-height:1.45}.business-entry>:deep(.app-button){grid-column:1/-1;margin-top:var(--space-1)}
 .language-options { display: grid; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-lg); }
 .language-options :deep(.app-radio) { width: 100%; min-height: 60px; padding-inline: var(--space-4); border-bottom: 1px solid var(--color-border); }
 .language-options :deep(.app-radio:last-child) { border-bottom: 0; }

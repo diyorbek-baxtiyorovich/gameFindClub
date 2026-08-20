@@ -65,4 +65,8 @@ onBeforeUnmount(() => {
 
 <template><div class="venue-map"><div ref="container" class="venue-map__canvas" /><slot v-if="ready" /></div></template>
 
-<style scoped>.venue-map, .venue-map__canvas { width: 100%; height: 100%; min-height: 360px; }.venue-map { position: relative; overflow: hidden; background: var(--color-surface-muted); }.venue-map:has(.venue-map__canvas) { touch-action: pan-x pan-y; }</style>
+<style scoped>
+.venue-map, .venue-map__canvas { width: 100%; height: 100%; min-height: 360px; }
+.venue-map { position: relative; overflow: hidden; background: var(--color-surface-muted); }
+.venue-map:has(.venue-map__canvas) { touch-action: pan-x pan-y; }
+</style>

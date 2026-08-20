@@ -123,9 +123,11 @@ watch(displayedVenues, (venues) => {
 .map-page__search > *{min-width:0}
 .map-page__search :deep(.app-search){min-width:0}
 .map-page__search :deep(.app-search__control){border:0;background:transparent}
-.map-page__categories { max-width: 100%; padding: var(--space-1) 0;pointer-events:auto }
+.map-page__categories { min-width:0;max-width:100%;overflow:hidden;padding:var(--space-1) 0;pointer-events:auto;mask-image:linear-gradient(to right,#000 0,#000 calc(100% - var(--space-5)),transparent 100%) }
+.map-page__categories :deep(.category-selector){max-width:100%;margin-inline:0;padding-inline:var(--space-2) var(--space-6);overscroll-behavior-x:contain;scroll-padding-inline:var(--space-2);scroll-snap-type:x proximity}
+.map-page__categories :deep(.category-selector > *){scroll-snap-align:start}
 .map-page__search-area{position:absolute;z-index:620;top:150px;left:50%;transform:translateX(-50%);white-space:nowrap;box-shadow:var(--elevation-2)}
-.map-page__message { position: absolute; z-index: 550; top: 72px; right: var(--space-4); left: var(--space-4); margin: 0; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-md); color: var(--color-text-secondary); background: var(--color-surface); box-shadow: var(--elevation-1); text-align: center; font-size: var(--font-size-sm); }
+.map-page__message { position: absolute; z-index: 550; top: 210px; right: var(--space-4); left: var(--space-4); margin: 0; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-md); color: var(--color-text-secondary); background: var(--color-surface); box-shadow: var(--elevation-1); text-align: center; font-size: var(--font-size-sm); }
 .map-page__preview{position:absolute;z-index:650;right:var(--space-3);bottom:var(--space-3);left:var(--space-3);padding:var(--space-4) var(--space-3) var(--space-3);border:1px solid var(--color-border);border-radius:var(--radius-xl);background:var(--color-surface);box-shadow:var(--elevation-2)}
 .map-page__preview :deep(.venue-card){border:0;box-shadow:none}
 .map-page__handle{position:absolute;top:7px;left:50%;width:44px;height:4px;transform:translateX(-50%);border-radius:var(--radius-pill);background:var(--color-border-strong)}
