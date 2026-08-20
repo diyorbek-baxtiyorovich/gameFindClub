@@ -1,0 +1,15 @@
+<script setup lang="ts">
+import { computed, reactive, ref, watch } from 'vue'
+import AppButton from '@/components/ui/AppButton.vue'
+import AppLucideIcon from '@/components/ui/AppLucideIcon.vue'
+import { getReviewCriteria } from '@/config'
+import type { ReviewFormSubmission } from '../model/review'
+const props = defineProps<{ venueId: string; categoryCode: string }>()
+const emit = defineEmits<{ submit: [payload: ReviewFormSubmission] }>()
+const rating = ref(0); const body = ref(''); const scores = reactive<Record<string, number>>({})
+const criteria = computed(() => getReviewCriteria(props.categoryCode))
+watch(criteria, (next) => { for (const key of Object.keys(scores)) delete scores[key]; for (const item of next) scores[item.key] = 0 }, { immediate: true })
+function send(): void { if (!rating.value) return; emit('submit', { venueId: props.venueId, categoryCode: props.categoryCode, rating: rating.value, body: body.value.trim() || undefined, criteria: criteria.value.filter((item) => scores[item.key]).map((item) => ({ criterionKey: item.key, score: scores[item.key] ?? 0 })) }); rating.value=0; body.value=''; for (const key of Object.keys(scores)) scores[key]=0 }
+</script>
+<template><form class="form" @submit.prevent="send"><h2>Share your experience</h2><fieldset><legend>Overall rating</legend><div class="stars"><button v-for="score in 5" :key="score" type="button" :aria-label="`${score} out of 5 stars`" :aria-pressed="rating===score" @click="rating=score"><AppLucideIcon name="star" :size="20" :filled="rating>=score" /></button></div></fieldset><fieldset v-for="criterion in criteria" :key="criterion.key"><legend>{{ criterion.label.defaultValue }}</legend><div class="scale"><button v-for="score in 5" :key="score" type="button" :aria-label="`${criterion.label.defaultValue}: ${score} out of 5`" :aria-pressed="scores[criterion.key]===score" :class="{selected:scores[criterion.key]===score}" @click="scores[criterion.key]=score">{{ score }}</button></div></fieldset><label>Comment<textarea v-model="body" rows="4" maxlength="1000" placeholder="What should others know?"/></label><AppButton type="submit" :disabled="!rating" full-width>Submit review</AppButton></form></template>
+<style scoped>.form{display:grid;gap:var(--space-4);padding:var(--space-4);border:1px solid var(--color-border);border-radius:var(--radius-lg);background:var(--color-surface)}h2{margin:0;font-size:var(--font-size-lg)}fieldset{margin:0;padding:0;border:0}legend,label{display:grid;gap:var(--space-2);font-weight:var(--font-weight-semibold)}.stars,.scale{display:flex;gap:var(--space-2)}.stars button,.scale button{min-width:var(--touch-target-min);min-height:var(--touch-target-min);border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-surface);cursor:pointer}.stars button[aria-pressed=true],.scale button.selected{color:var(--color-text-inverse);border-color:var(--color-primary);background:var(--color-primary)}textarea{resize:vertical;padding:var(--space-3);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text-primary);background:var(--color-surface);font:inherit}</style>
