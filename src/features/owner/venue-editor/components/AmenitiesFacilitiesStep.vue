@@ -15,16 +15,20 @@ const label = (labelKey: string, fallback: string): string => {
 
 function toggleAmenity(id: string, name: string): void {
   const selected = props.draft.amenities.some((item) => item.id === id)
-  draftStore.setAmenities(selected
-    ? props.draft.amenities.filter((item) => item.id !== id)
-    : [...props.draft.amenities, { id, name }])
+  draftStore.setAmenities(
+    selected
+      ? props.draft.amenities.filter((item) => item.id !== id)
+      : [...props.draft.amenities, { id, name }],
+  )
 }
 
 function toggleFacility(id: string, name: string): void {
   const selected = props.draft.facilities.some((item) => item.id === id)
-  draftStore.setFacilities(selected
-    ? props.draft.facilities.filter((item) => item.id !== id)
-    : [...props.draft.facilities, { id, name }])
+  draftStore.setFacilities(
+    selected
+      ? props.draft.facilities.filter((item) => item.id !== id)
+      : [...props.draft.facilities, { id, name }],
+  )
 }
 </script>
 
@@ -34,23 +38,50 @@ function toggleFacility(id: string, name: string): void {
       <h3>{{ t('owner.editor.amenities.title') }}</h3>
       <p>{{ t('owner.editor.amenities.description') }}</p>
       <div class="amenities-step__chips">
-        <AppChip v-for="option in UNIVERSAL_AMENITY_OPTIONS" :key="option.id" :selected="draft.amenities.some((item) => item.id === option.id)" @click="toggleAmenity(option.id, label(option.labelKey, option.defaultLabel))">{{ label(option.labelKey, option.defaultLabel) }}</AppChip>
+        <AppChip
+          v-for="option in UNIVERSAL_AMENITY_OPTIONS"
+          :key="option.id"
+          :selected="draft.amenities.some((item) => item.id === option.id)"
+          @click="toggleAmenity(option.id, label(option.labelKey, option.defaultLabel))"
+          >{{ label(option.labelKey, option.defaultLabel) }}</AppChip
+        >
       </div>
     </section>
     <section>
       <h3>{{ t('owner.editor.facilities.title') }}</h3>
       <p>{{ t('owner.editor.facilities.description') }}</p>
       <div class="amenities-step__chips">
-        <AppChip v-for="option in UNIVERSAL_FACILITY_OPTIONS" :key="option.id" :selected="draft.facilities.some((item) => item.id === option.id)" @click="toggleFacility(option.id, label(option.labelKey, option.defaultLabel))">{{ label(option.labelKey, option.defaultLabel) }}</AppChip>
+        <AppChip
+          v-for="option in UNIVERSAL_FACILITY_OPTIONS"
+          :key="option.id"
+          :selected="draft.facilities.some((item) => item.id === option.id)"
+          @click="toggleFacility(option.id, label(option.labelKey, option.defaultLabel))"
+          >{{ label(option.labelKey, option.defaultLabel) }}</AppChip
+        >
       </div>
     </section>
   </div>
 </template>
 
 <style scoped>
-.amenities-step { display: grid; gap: var(--space-8); }
-.amenities-step section { display: grid; gap: var(--space-3); }
-.amenities-step h3, .amenities-step p { margin: 0; }
-.amenities-step p { color: var(--color-text-secondary); }
-.amenities-step__chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.amenities-step {
+  display: grid;
+  gap: var(--space-8);
+}
+.amenities-step section {
+  display: grid;
+  gap: var(--space-3);
+}
+.amenities-step h3,
+.amenities-step p {
+  margin: 0;
+}
+.amenities-step p {
+  color: var(--color-text-secondary);
+}
+.amenities-step__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
 </style>

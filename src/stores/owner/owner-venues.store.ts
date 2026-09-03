@@ -2,10 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
 import type { CreateVenueInput, OwnerVenue, UpdateVenueInput } from '@/entities/owner'
-import {
-  localOwnerVenueRepository,
-  type OwnerVenueRepository,
-} from '@/repositories/owner'
+import { localOwnerVenueRepository, type OwnerVenueRepository } from '@/repositories/owner'
 
 const toErrorMessage = (error: unknown): string =>
   error instanceof Error ? error.message : 'Unable to complete the Owner venue request.'
@@ -62,7 +59,7 @@ export const useOwnerVenuesStore = defineStore('owner-venues', () => {
   ): Promise<OwnerVenue | undefined> {
     const updated = await execute(() => repository.update(id, input))
     if (updated) {
-      items.value = items.value.map((venue) => venue.id === id ? updated : venue)
+      items.value = items.value.map((venue) => (venue.id === id ? updated : venue))
       if (selected.value?.id === id) selected.value = updated
     }
     return updated
@@ -89,7 +86,7 @@ export const useOwnerVenuesStore = defineStore('owner-venues', () => {
   ): Promise<OwnerVenue | undefined> {
     const submitted = await execute(() => repository.submitForReview(id))
     if (submitted) {
-      items.value = items.value.map((venue) => venue.id === id ? submitted : venue)
+      items.value = items.value.map((venue) => (venue.id === id ? submitted : venue))
       if (selected.value?.id === id) selected.value = submitted
     }
     return submitted
@@ -101,7 +98,7 @@ export const useOwnerVenuesStore = defineStore('owner-venues', () => {
   ): Promise<OwnerVenue | undefined> {
     const archived = await execute(() => repository.archive(id))
     if (archived) {
-      items.value = items.value.map((venue) => venue.id === id ? archived : venue)
+      items.value = items.value.map((venue) => (venue.id === id ? archived : venue))
       if (selected.value?.id === id) selected.value = archived
     }
     return archived

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AppBackButton from '@/components/navigation/AppBackButton.vue'
 
-withDefaults(defineProps<{ title: string; showBackButton?: boolean }>(), { showBackButton: false })
+withDefaults(defineProps<{ title?: string; showBackButton?: boolean }>(), { title: '', showBackButton: false })
 </script>
 
 <template>

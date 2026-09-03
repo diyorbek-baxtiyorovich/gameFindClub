@@ -20,7 +20,7 @@ const user = telegram.user
 const displayName = computed(() => user ? [user.first_name, user.last_name].filter(Boolean).join(' ') : t('profile.guest'))
 const initials = computed(() => displayName.value.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase())
 const locationLabel = computed(() => location.manualLocation.district || location.manualLocation.city || (location.hasLocation ? t('profile.current_location') : t('profile.default_city')))
-const darkMode = ref(document.documentElement.dataset.theme === 'dark')
+const darkMode = ref(document.documentElement.dataset.theme !== 'light')
 const languageModalOpen = ref(false)
 const { locale, setLocale } = useLocale()
 

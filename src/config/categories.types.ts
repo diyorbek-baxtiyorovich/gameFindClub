@@ -1,7 +1,7 @@
 import type { FilterSchema } from '@/types'
 
-export type CategoryCode = 'gaming' | 'tennis' | 'football' | 'gym' | 'padel' | 'billiard'
-export type CategoryAccent = 'gaming' | 'tennis' | 'football' | 'gym' | 'neutral'
+export type CategoryCode = 'pc-gaming' | 'playstation' | 'vr' | 'private-room' | 'bootcamp' | 'open-24-7'
+export type CategoryAccent = 'gaming' | 'cyan' | 'neutral'
 
 export interface LocalizedLabel {
   key: string

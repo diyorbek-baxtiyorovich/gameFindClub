@@ -28,10 +28,12 @@ export type {
 } from './model/venue'
 
 export {
-  footballVenueDetail,
   gamingVenueDetail,
-  gymVenueDetail,
-  tennisVenueDetail,
+  cyberZoneDetail,
+  matrixDetail,
+  vrLabDetail,
+  bootcampDetail,
+  nightCityDetail,
   venueDetailFixtures,
   venueListFixtures,
 } from './model/fixtures'

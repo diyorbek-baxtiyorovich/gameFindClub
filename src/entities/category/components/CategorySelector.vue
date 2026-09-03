@@ -2,15 +2,17 @@
 import AppChip from '@/components/ui/AppChip.vue'
 import { CATEGORY_CONFIGS } from '@/config'
 import AppLucideIcon from '@/components/ui/AppLucideIcon.vue'
-import { t, type MessageKey } from '@/i18n'
+import { t } from '@/i18n'
 
 defineProps<{ selectedId?: string | null; includeAll?: boolean }>()
 defineEmits<{ select: [categoryId: string | null] }>()
 const categoryIcons: Readonly<Record<string, string>> = {
-  gaming: 'gamepad',
-  tennis: 'trophy',
-  football: 'trophy',
-  gym: 'dumbbell',
+  'pc-gaming': 'gamepad',
+  playstation: 'gamepad',
+  vr: 'glasses',
+  'private-room': 'door',
+  bootcamp: 'users',
+  'open-24-7': 'clock',
 }
 </script>
 
@@ -28,7 +30,7 @@ const categoryIcons: Readonly<Record<string, string>> = {
       <span class="category-selector__icon"
         ><AppLucideIcon :name="categoryIcons[category.code] ?? 'sparkles'" :size="16"
       /></span>
-      {{ t(category.label.key as MessageKey) }}
+      {{ category.label.defaultValue }}
     </AppChip>
   </div>
 </template>

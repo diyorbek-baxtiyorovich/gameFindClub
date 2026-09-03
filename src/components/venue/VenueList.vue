@@ -21,8 +21,8 @@ withDefaults(
     cardVariant: 'default',
     loading: false,
     skeletonCount: 3,
-    emptyTitle: 'No venues found',
-    emptyDescription: 'Try changing your search or filters.',
+    emptyTitle: 'Gaming klublar topilmadi',
+    emptyDescription: 'Qidiruv yoki filtrlarni o‘zgartirib ko‘ring.',
   },
 )
 
@@ -34,7 +34,7 @@ defineEmits<{ favorite: [venue: VenueListItem]; navigate: [venue: VenueListItem]
     v-if="loading"
     class="venue-list"
     :class="`venue-list--${layout}`"
-    aria-label="Loading venues"
+    aria-label="Gaming klublar yuklanmoqda"
   >
     <div v-for="index in skeletonCount" :key="index" class="venue-list__skeleton">
       <AppSkeleton height="150px" radius="var(--radius-lg)" />
@@ -86,5 +86,8 @@ defineEmits<{ favorite: [venue: VenueListItem]; navigate: [venue: VenueListItem]
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   background: var(--color-surface);
+}
+@media (min-width: 760px) {
+  .venue-list:not(.venue-list--horizontal) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 </style>

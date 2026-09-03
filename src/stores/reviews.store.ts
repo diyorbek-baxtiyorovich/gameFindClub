@@ -16,11 +16,18 @@ export const useReviewsStore = defineStore('reviews', () => {
       items.value = reviewFixtures
     } catch {
       error.value = 'Reviews could not be loaded. Please try again.'
-    } finally { loading.value = false }
+    } finally {
+      loading.value = false
+    }
   }
 
   function submit(payload: ReviewFormSubmission): void {
-    const review: Review = { ...payload, id: `local-${Date.now()}`, author: { id: 'local-user', displayName: 'You' }, createdAt: new Date().toISOString() }
+    const review: Review = {
+      ...payload,
+      id: `local-${Date.now()}`,
+      author: { id: 'local-user', displayName: 'You' },
+      createdAt: new Date().toISOString(),
+    }
     items.value = [review, ...items.value]
   }
 

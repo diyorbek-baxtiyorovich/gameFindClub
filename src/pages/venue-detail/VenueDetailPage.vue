@@ -21,6 +21,8 @@ import VenueQuickFacts from '@/entities/venue/components/detail/VenueQuickFacts.
 import VenueReviews from '@/entities/venue/components/detail/VenueReviews.vue'
 import VenueSchedule from '@/entities/venue/components/detail/VenueSchedule.vue'
 import VenueSimilarList from '@/entities/venue/components/detail/VenueSimilarList.vue'
+import GamingAvailability from '@/entities/venue/components/detail/GamingAvailability.vue'
+import InstalledGames from '@/entities/venue/components/detail/InstalledGames.vue'
 import type { VenuePrimaryAction } from '@/entities/venue'
 import { selectPrimaryVenueAction } from '@/entities/venue'
 import { getTelegramService } from '@/services'
@@ -39,9 +41,18 @@ const similar = computed(() => venues.selected ? venueListFixtures.filter((venue
 const venueReviews = computed(() => venues.selected ? reviewFixtures.filter((review) => review.venueId === venues.selected?.id) : [])
 
 function activate(action: VenuePrimaryAction): void {
+  if (action.kind === 'book' && action.isAvailable !== false) {
+    void router.push({ name: 'booking', params: { slug: props.slug } })
+    return
+  }
   if (!action.url || action.isAvailable === false) return
   if (action.url.startsWith('tel:') && typeof window !== 'undefined') window.location.href = action.url
   else telegram.openLink(action.url)
+}
+async function shareVenue(): Promise<void> {
+  const data = { title: venues.selected?.name ?? 'GameClubFinder', url: window.location.href }
+  if (navigator.share) await navigator.share(data)
+  else await navigator.clipboard?.writeText(data.url)
 }
 
 watch(() => props.slug, (slug) => venues.selectBySlug(slug), { immediate: true })
@@ -58,16 +69,19 @@ onUnmounted(() => { venues.cancelPending(); venues.clearSelected() })
         <VenueGallery :venue="venues.selected" />
         <button class="venue-detail-page__hero-action venue-detail-page__back" type="button" :aria-label="t('venue.back')" @click="router.back()"><AppLucideIcon name="arrow-left" :size="27" /></button>
         <button class="venue-detail-page__hero-action venue-detail-page__heart" type="button" :aria-label="favorites.isFavorite(venues.selected.id) ? t('venue.unsave') : t('venue.save')" :aria-pressed="favorites.isFavorite(venues.selected.id)" @click="favorites.toggle(venues.selected.id)"><AppLucideIcon name="heart" :size="27" :filled="favorites.isFavorite(venues.selected.id)" /></button>
+        <button class="venue-detail-page__hero-action venue-detail-page__share" type="button" aria-label="Klubni ulashish" @click="shareVenue"><AppLucideIcon name="share" :size="24" /></button>
       </div>
       <div class="venue-detail-page__sheet">
         <span class="venue-detail-page__handle" aria-hidden="true" />
         <VenueHeader :venue="venues.selected" />
         <VenueActions :venue="venues.selected" @action="activate" />
         <VenueQuickFacts :venue="venues.selected" />
+        <GamingAvailability :resources="venues.selected.resources ?? []" />
         <section v-if="venues.selected.description" class="venue-detail-page__summary"><h2>{{ t('venue.summary') }}</h2><p>{{ venues.selected.description }}</p></section>
         <VenuePricing :options="venues.selected.pricing" />
         <VenueActivities :items="venues.selected.activities" />
         <CategoryDetailSections :venue="venues.selected" />
+        <InstalledGames :games="venues.selected.installedGames ?? []" />
         <VenueFacilities :items="venues.selected.facilities" />
         <VenueAmenities :items="venues.selected.amenities" />
         <VenueSchedule :venue="venues.selected" :schedule="venues.selected.openingHours" />
@@ -89,6 +103,7 @@ onUnmounted(() => { venues.cancelPending(); venues.clearSelected() })
 .venue-detail-page__hero-action { position: absolute; z-index: 5; top: calc(var(--space-4) + var(--safe-area-top)); width: 52px; height: 52px; border: 0; border-radius: 50%; color: white; background: rgb(17 24 39 / 35%); backdrop-filter: blur(10px); cursor: pointer; font-size: 2rem; }
 .venue-detail-page__back { left: var(--space-4); }
 .venue-detail-page__heart { right: var(--space-4); }
+.venue-detail-page__share { right: calc(var(--space-4) + 62px); }
 .venue-detail-page__sheet { position: relative; z-index: 4; display: grid; gap: var(--space-6); margin-top: -28px; padding: var(--space-5) var(--space-4) var(--space-10); border-radius: 26px 26px 0 0; background: var(--color-bg); }
 .venue-detail-page__handle { width: 52px; height: 5px; justify-self: center; margin-top: calc(var(--space-2) * -1); border-radius: var(--radius-pill); background: var(--color-border-strong); }
 .venue-detail-page__summary { padding-block: var(--space-5); border-block: 1px solid var(--color-border); }

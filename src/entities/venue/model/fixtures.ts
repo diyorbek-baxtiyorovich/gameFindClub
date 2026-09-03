@@ -4,194 +4,86 @@ import type { CategorySummary } from '@/entities/category'
 
 import type { VenueDetail, VenueListItem, Weekday } from './venue'
 
-const weekdays: readonly Weekday[] = [
-  'monday',
-  'tuesday',
-  'wednesday',
-  'thursday',
-  'friday',
-  'saturday',
-  'sunday',
-]
-const weeklySchedule = (opensAt: string, closesAt: string) => weekdays.map((day) => ({
-  day,
-  periods: [{ opensAt, closesAt }],
-}))
-
+const weekdays: readonly Weekday[] = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+const schedule = (open24 = false) => ({
+  weekly: weekdays.map((day) => open24 ? { day, isOpen24Hours: true } : { day, periods: [{ opensAt: '10:00', closesAt: '02:00' }] }),
+  statusText: open24 ? '24/7 ochiq' : undefined,
+})
 const categorySummary = (code: CategoryCode): CategorySummary => {
-  const category = getCategoryByCode(code)
+  const item = getCategoryByCode(code)
+  return { id: item.id, slug: item.code, name: item.label.defaultValue, icon: item.icon }
+}
+
+const commonGames = ['Counter-Strike 2', 'Dota 2', 'Valorant', 'PUBG', 'Fortnite', 'EA Sports FC', 'GTA V', 'Call of Duty', 'League of Legends']
+const images = {
+  hall: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=84',
+  pc: 'https://images.unsplash.com/photo-1598550476439-6847785fcea6?auto=format&fit=crop&w=1200&q=84',
+  neon: 'https://images.unsplash.com/photo-1603481546238-487240415921?auto=format&fit=crop&w=1200&q=84',
+}
+
+interface ClubInput {
+  id: string; slug: string; name: string; category: CategoryCode; description: string; address: string
+  district: string; latitude: number; longitude: number; distance: number; rating: number; reviews: number
+  open: boolean; open24?: boolean; available: number; total: number; price: number; tier: string
+  gpu: string; cpu: string; ram: string; refresh: number; image: string; badges: string[]
+}
+
+function club(input: ClubInput): VenueDetail {
+  const availability = input.available === 0 ? 'unavailable' : input.available <= 4 ? 'limited' : 'available'
   return {
-    id: category.id,
-    slug: category.code,
-    name: category.label.defaultValue,
-    icon: category.icon,
+    id: input.id,
+    slug: input.slug,
+    name: input.name,
+    category: categorySummary(input.category),
+    shortDescription: input.description,
+    description: `${input.description} Kuchli qurilmalar, barqaror internet va jamoaviy o‘yin uchun qulay muhit.`,
+    address: { formatted: input.address, city: 'Toshkent', district: input.district },
+    location: { latitude: input.latitude, longitude: input.longitude },
+    coverMedia: { id: `${input.id}-cover`, type: 'image', url: input.image, alt: `${input.name} gaming zali` },
+    media: [
+      { id: `${input.id}-1`, type: 'image', url: input.image, alt: `${input.name} asosiy gaming zali` },
+      { id: `${input.id}-2`, type: 'image', url: images.pc, alt: `${input.name} kompyuter qatori` },
+      { id: `${input.id}-3`, type: 'image', url: images.neon, alt: `${input.name} private xonasi` },
+    ],
+    rating: { average: input.rating, count: input.reviews, scale: 5 },
+    openingHours: schedule(input.open24),
+    operatingStatus: { isOpen: input.open, label: input.open ? (input.open24 ? '24/7 ochiq' : 'Hozir ochiq') : 'Yopiq', closesAt: input.open24 ? undefined : '02:00', opensAt: input.open ? undefined : '10:00' },
+    activities: commonGames.map((name) => ({ id: name.toLowerCase().replaceAll(' ', '-'), name })),
+    facilities: [{ id: 'team-room', name: 'Jamoa xonasi' }, { id: 'streaming', name: 'Streaming setup' }],
+    amenities: [{ id: 'food-drinks', name: 'Taom va ichimliklar' }, { id: 'parking', name: 'Avtoturargoh' }, { id: 'air-conditioning', name: 'Konditsioner' }],
+    resources: [
+      { id: `${input.id}-standard`, name: 'Standard PC', resourceType: 'gaming-station', quantity: Math.max(12, input.total - 16), availability, attributes: { availableStations: Math.max(0, input.available - 6), cpu: 'Intel Core i5-13400F', gpu: 'RTX 3060', ram: '16 GB', monitorSize: '24.5″', monitorRefreshRate: 165, keyboard: 'HyperX Alloy', mouse: 'Logitech G102', headset: 'HyperX Cloud II', gamingChair: 'Cougar Armor', internetSpeed: '1 Gbps', tier: 'Standard', hourlyPrice: 20000 } },
+      { id: `${input.id}-premium`, name: input.tier, resourceType: 'gaming-station', quantity: 12, availability, attributes: { availableStations: Math.min(input.available, 6), cpu: input.cpu, gpu: input.gpu, ram: input.ram, monitorSize: '27″', monitorRefreshRate: input.refresh, keyboard: 'SteelSeries Apex Pro', mouse: 'Logitech G Pro X', headset: 'SteelSeries Arctis Nova', gamingChair: 'AndaSeat Kaiser', internetSpeed: '2.5 Gbps', tier: input.tier, hourlyPrice: input.price } },
+    ],
+    pricing: [
+      { id: `${input.id}-standard-price`, name: 'Standard PC', price: { amount: 20000, currency: 'UZS' }, unit: 'hour' },
+      { id: `${input.id}-premium-price`, name: input.tier, price: { amount: input.price, currency: 'UZS' }, unit: 'hour' },
+    ],
+    priceFrom: { id: `${input.id}-from`, name: 'Boshlang‘ich narx', price: { amount: Math.min(20000, input.price), currency: 'UZS' }, unit: 'hour', isStartingPrice: true },
+    occupancy: { level: input.available === 0 ? 'full' : input.available <= 4 ? 'high' : 'moderate', availableCount: input.available, totalCount: input.total, label: `${input.available} ta joy bo‘sh` },
+    primaryAction: { kind: 'book', label: 'Joy band qilish', isAvailable: input.available > 0 },
+    contact: { phone: '+998712000000', telegramUsername: 'gameclubfinder' },
+    phone: '+998 71 200 00 00',
+    isVerified: true,
+    isOpen24Hours: input.open24,
+    installedGames: commonGames,
+    badges: input.badges,
   }
 }
 
-export const gamingVenueDetail = {
-  id: 'venue-gaming-nexus',
-  slug: 'nexus-gaming-arena',
-  name: 'Nexus Gaming Arena',
-  category: categorySummary('gaming'),
-  shortDescription: 'Competitive gaming stations and private VIP rooms.',
-  description: 'A modern gaming venue for teams, casual players, and tournaments.',
-  address: { formatted: '12 Amir Temur Avenue, Tashkent', city: 'Tashkent' },
-  location: { latitude: 41.3111, longitude: 69.2797 },
-  coverMedia: {
-    id: 'gaming-cover',
-    type: 'image',
-    url: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=900&q=82',
-    alt: 'Gaming stations at Nexus Gaming Arena',
-  },
-  media: [
-    { id: 'gaming-1', type: 'image', url: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=84', alt: 'Main gaming hall' },
-    { id: 'gaming-2', type: 'image', url: 'https://images.unsplash.com/photo-1598550476439-6847785fcea6?auto=format&fit=crop&w=1200&q=84', alt: 'Private VIP room' },
-  ],
-  rating: { average: 4.8, count: 326, scale: 5 },
-  openingHours: { weekly: weeklySchedule('09:00', '02:00') },
-  activities: [
-    { id: 'cs2', name: 'CS2' },
-    { id: 'dota-2', name: 'Dota 2' },
-  ],
-  facilities: [{ id: 'vip', name: 'VIP rooms' }],
-  amenities: [{ id: 'snacks', name: 'Snack bar' }],
-  resources: [
-    {
-      id: 'gaming-pc-pro',
-      name: 'Pro PC station',
-      resourceType: 'gaming-station',
-      quantity: 36,
-      availability: 'available',
-      attributes: { monitorRefreshRate: 240, gpu: 'RTX 4070', cpu: 'Ryzen 7', ram: '32 GB', headset: 'Pro headset', games: ['CS2', 'Dota 2'], tier: 'VIP' },
-    },
-  ],
-  pricing: [
-    { id: 'gaming-hour', name: 'Standard station', price: { amount: 35000, currency: 'UZS' }, unit: 'hour' },
-    { id: 'gaming-vip-hour', name: 'VIP station', price: { amount: 65000, currency: 'UZS' }, unit: 'hour' },
-  ],
-  priceFrom: {
-    id: 'gaming-hour',
-    name: 'Standard station',
-    price: { amount: 35000, currency: 'UZS' },
-    unit: 'hour',
-    isStartingPrice: true,
-  },
-  occupancy: { level: 'moderate', availableCount: 14, totalCount: 36 },
-  operatingStatus: { isOpen: true, label: 'Open now', closesAt: '02:00' },
-  primaryAction: { kind: 'book', label: 'Book a station', isAvailable: true },
-  isFavorite: false,
-  isVerified: true,
-} satisfies VenueDetail
+export const gamingVenueDetail = club({ id: 'club-nexus', slug: 'nexus-gaming-arena', name: 'Nexus Gaming Arena', category: 'pc-gaming', description: 'Professional esports arena va VIP PC zonalari.', address: 'Amir Temur shoh ko‘chasi, 12', district: 'Yunusobod', latitude: 41.3311, longitude: 69.2897, distance: 850, rating: 4.9, reviews: 326, open: true, open24: true, available: 14, total: 48, price: 40000, tier: 'Premium PC', gpu: 'RTX 4070', cpu: 'Ryzen 7 7800X3D', ram: '32 GB', refresh: 240, image: images.hall, badges: ['24/7', 'VIP Room', 'Tournament'] })
+export const cyberZoneDetail = club({ id: 'club-cyber-zone', slug: 'cyber-zone-chilonzor', name: 'Cyber Zone Chilonzor', category: 'private-room', description: 'Do‘stlar uchun yopiq xonalar va premium PC.', address: 'Bunyodkor ko‘chasi, 18', district: 'Chilonzor', latitude: 41.2854, longitude: 69.2048, distance: 2100, rating: 4.7, reviews: 184, open: true, available: 4, total: 30, price: 45000, tier: 'VIP PC', gpu: 'RTX 4070 Super', cpu: 'Intel Core i7-14700F', ram: '32 GB', refresh: 240, image: images.pc, badges: ['VIP Room', 'PS5'] })
+export const matrixDetail = club({ id: 'club-matrix', slug: 'matrix-playstation-club', name: 'Matrix PlayStation Club', category: 'playstation', description: 'PS5 va katta ekranli private konsol xonalari.', address: 'Shota Rustaveli ko‘chasi, 47', district: 'Yakkasaroy', latitude: 41.2921, longitude: 69.2532, distance: 3400, rating: 4.8, reviews: 219, open: true, available: 7, total: 16, price: 55000, tier: 'PS5 Private Room', gpu: 'PS5', cpu: 'AMD Zen 2', ram: '16 GB', refresh: 120, image: images.neon, badges: ['PS5', 'Private Room'] })
+export const vrLabDetail = club({ id: 'club-vr-lab', slug: 'vr-lab-tashkent', name: 'VR Lab Tashkent', category: 'vr', description: 'Meta Quest 3 va xona bo‘ylab erkin VR tajribasi.', address: 'Buyuk Ipak Yo‘li, 105', district: 'Mirzo Ulug‘bek', latitude: 41.3265, longitude: 69.3281, distance: 4600, rating: 4.6, reviews: 97, open: true, available: 3, total: 10, price: 60000, tier: 'VR Zone', gpu: 'RTX 4080', cpu: 'Intel Core i9-14900K', ram: '64 GB', refresh: 120, image: images.hall, badges: ['VR', 'Private Room'] })
+export const bootcampDetail = club({ id: 'club-titan', slug: 'titan-team-bootcamp', name: 'Titan Team Bootcamp', category: 'bootcamp', description: '5 kishilik jamoalar uchun turnirga tayyor bootcamp.', address: 'Maxtumquli ko‘chasi, 72', district: 'Yashnobod', latitude: 41.3044, longitude: 69.3122, distance: 5800, rating: 4.9, reviews: 141, open: true, open24: true, available: 5, total: 20, price: 50000, tier: 'Bootcamp PC', gpu: 'RTX 4070 Ti', cpu: 'Ryzen 9 7900X', ram: '32 GB', refresh: 360, image: images.pc, badges: ['Bootcamp', 'Tournament', '24/7'] })
+export const nightCityDetail = club({ id: 'club-night-city', slug: 'night-city-gaming', name: 'Night City Gaming', category: 'open-24-7', description: 'Tungi gaming, tez internet va qulay standard zona.', address: 'Beruniy ko‘chasi, 6', district: 'Shayxontohur', latitude: 41.3162, longitude: 69.2452, distance: 6200, rating: 4.5, reviews: 268, open: false, open24: true, available: 0, total: 42, price: 30000, tier: 'Premium PC', gpu: 'RTX 4060 Ti', cpu: 'Intel Core i5-14600KF', ram: '32 GB', refresh: 240, image: images.neon, badges: ['24/7', 'Snacks'] })
 
-export const tennisVenueDetail = {
-  id: 'venue-tennis-center',
-  slug: 'central-indoor-tennis',
-  name: 'Central Indoor Tennis Center',
-  category: categorySummary('tennis'),
-  shortDescription: 'Six climate-controlled indoor hard courts.',
-  address: { formatted: '8 Bunyodkor Street, Tashkent', city: 'Tashkent' },
-  location: { latitude: 41.2854, longitude: 69.2048 },
-  coverMedia: { id: 'tennis-cover', type: 'image', url: 'https://images.unsplash.com/photo-1622279457486-62dcc4a431d6?auto=format&fit=crop&w=900&q=82', alt: 'Indoor tennis court' },
-  rating: { average: 4.6, count: 118, scale: 5 },
-  openingHours: { weekly: weeklySchedule('07:00', '23:00') },
-  operatingStatus: { isOpen: true, closesAt: '23:00' },
-  activities: [{ id: 'tennis', name: 'Tennis' }],
-  facilities: [{ id: 'racket-rental', name: 'Racket rental' }],
-  resources: [
-    {
-      id: 'indoor-hard-court',
-      name: 'Indoor hard court',
-      resourceType: 'tennis-court',
-      quantity: 6,
-      attributes: { surface: 'hard', setting: 'indoor', courtCount: 6, lighting: true, racketRental: true, coachAvailable: true },
-    },
-  ],
-  pricing: [
-    { id: 'court-hour', name: 'Court rental', price: { amount: 180000, currency: 'UZS' }, unit: 'hour' },
-  ],
-  primaryAction: { kind: 'call', label: 'Check availability', isAvailable: true },
-  isVerified: true,
-} satisfies VenueDetail
-
-export const footballVenueDetail = {
-  id: 'venue-football-five',
-  slug: 'five-side-football-park',
-  name: 'Five Side Football Park',
-  category: categorySummary('football'),
-  shortDescription: 'Outdoor 5x5 field with professional artificial turf.',
-  address: { formatted: '44 Small Ring Road, Tashkent', city: 'Tashkent' },
-  location: { latitude: 41.3265, longitude: 69.2281 },
-  coverMedia: { id: 'football-cover', type: 'image', url: 'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?auto=format&fit=crop&w=900&q=82', alt: 'Five-a-side football field' },
-  media: [{ id: 'football-1', type: 'image', url: 'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?auto=format&fit=crop&w=1200&q=84', alt: 'Artificial turf field' }],
-  rating: { average: 4.3, count: 89, scale: 5 },
-  openingHours: { weekly: weeklySchedule('09:00', '23:00') },
-  amenities: [{ id: 'shower', name: 'Shower' }],
-  facilities: [{ id: 'changing-room', name: 'Changing room' }],
-  resources: [
-    {
-      id: 'field-5x5',
-      name: '5x5 field',
-      resourceType: 'football-field',
-      quantity: 2,
-      availability: 'unavailable',
-      attributes: { fieldSize: '5x5', surface: 'artificial-turf', setting: 'outdoor', shower: true, changingRoom: true, ballRental: true },
-    },
-  ],
-  pricing: [
-    { id: 'field-hour', name: 'Field rental', price: { amount: 300000, currency: 'UZS' }, unit: 'hour' },
-  ],
-  priceFrom: { id: 'field-hour', name: 'Field rental', price: { amount: 300000, currency: 'UZS' }, unit: 'hour' },
-  occupancy: { level: 'full', availableCount: 0, totalCount: 2, label: 'Closed now' },
-  operatingStatus: { isOpen: false, label: 'Closed', opensAt: '09:00' },
-  primaryAction: { kind: 'book', label: 'Book a field', isAvailable: false, disabledReason: 'Venue is closed' },
-} satisfies VenueDetail
-
-export const gymVenueDetail = {
-  id: 'venue-gym-very-long-name',
-  slug: 'twenty-four-seven-strength-and-wellness',
-  name: 'Twenty Four Seven Strength, Conditioning and Complete Wellness Center',
-  category: categorySummary('gym'),
-  shortDescription: 'A 24/7 training space with coaching and recovery facilities.',
-  address: { formatted: '3 Navoi Street, Tashkent', city: 'Tashkent' },
-  location: { latitude: 41.3162, longitude: 69.2452 },
-  coverMedia: { id: 'gym-cover', type: 'image', url: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=900&q=82', alt: 'Modern fitness training area' },
-  openingHours: {
-    weekly: weekdays.map((day) => ({ day, isOpen24Hours: true })),
-    statusText: 'Open 24/7',
-  },
-  operatingStatus: { isOpen: true, label: 'Open 24/7' },
-  activities: [
-    { id: 'strength-training', name: 'Strength training' },
-    { id: 'personal-training', name: 'Personal training' },
-  ],
-  facilities: [{ id: 'trainer', name: 'Personal trainer' }],
-  amenities: [{ id: 'sauna', name: 'Sauna' }],
-  resources: [
-    { id: 'gym-floor', name: 'Training floor', resourceType: 'fitness-area', attributes: { trainerAvailable: true, equipmentGroups: ['Strength', 'Cardio', 'Functional'], pool: false, sauna: true, groupClasses: true } },
-  ],
-  pricing: [
-    { id: 'gym-month', name: 'Monthly membership', price: { amount: 550000, currency: 'UZS' }, unit: 'month' },
-  ],
-  primaryAction: { kind: 'open-url', label: 'Join now', url: 'https://example.com/join', isAvailable: true },
-} satisfies VenueDetail
-
-export const venueDetailFixtures = [
-  gamingVenueDetail,
-  tennisVenueDetail,
-  footballVenueDetail,
-  gymVenueDetail,
-] as const satisfies readonly VenueDetail[]
-
-export const venueListFixtures = [
-  { ...gamingVenueDetail, distanceMeters: 850, highlights: ['240 Hz', 'RTX 4070', 'VIP'], activityIds: ['cs2', 'dota-2'], amenityIds: ['snacks'] },
-  { ...tennisVenueDetail, distanceMeters: 2400, priceFrom: undefined, highlights: ['Hard', 'Indoor', '6 courts'], activityIds: ['tennis'], amenityIds: [] },
-  { ...footballVenueDetail, distanceMeters: 5100, highlights: ['5x5', 'Artificial turf', 'Shower'], activityIds: ['football'], amenityIds: ['shower'] },
-  {
-    ...gymVenueDetail,
-    rating: undefined,
-    distanceMeters: undefined,
-    highlights: ['Open 24/7', 'Personal trainer', 'Sauna'],
-    activityIds: ['strength-training', 'personal-training'],
-    amenityIds: ['sauna'],
-  },
-] as const satisfies readonly VenueListItem[]
+export const venueDetailFixtures = [gamingVenueDetail, cyberZoneDetail, matrixDetail, vrLabDetail, bootcampDetail, nightCityDetail] as const satisfies readonly VenueDetail[]
+const distances = [850, 2100, 3400, 4600, 5800, 6200]
+export const venueListFixtures = venueDetailFixtures.map((item, index) => ({
+  ...item,
+  distanceMeters: distances[index],
+  highlights: [String(item.resources?.[1]?.attributes?.gpu ?? ''), `${item.resources?.[1]?.attributes?.monitorRefreshRate ?? ''} Hz`, String(item.resources?.[1]?.attributes?.ram ?? '')],
+  activityIds: item.activities?.map((activity) => activity.id),
+  amenityIds: item.amenities?.map((amenity) => amenity.id),
+})) satisfies readonly VenueListItem[]

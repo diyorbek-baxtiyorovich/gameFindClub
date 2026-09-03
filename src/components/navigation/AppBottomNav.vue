@@ -56,6 +56,8 @@ const route = useRoute()
 }
 .bottom-nav__item--active {
   color: var(--color-primary);
+  text-shadow: 0 0 16px color-mix(in srgb, var(--color-primary) 64%, transparent);
+  background: linear-gradient(to top, var(--color-primary-soft), transparent 76%);
 }
 .bottom-nav__icon {
   font-size: 1.45rem;
@@ -66,7 +68,7 @@ const route = useRoute()
   .bottom-nav {
     right: 50%;
     left: auto;
-    width: var(--content-max-width);
+    width: min(680px, calc(100% - 32px));
     transform: translateX(50%);
     border-right: 1px solid var(--color-border);
     border-left: 1px solid var(--color-border);

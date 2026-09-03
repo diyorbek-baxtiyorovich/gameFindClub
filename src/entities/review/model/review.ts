@@ -26,6 +26,9 @@ export interface Review {
   createdAt: string
   criteria?: readonly ReviewCriterionScore[]
   ownerReply?: OwnerReply
+  pcTier?: string
+  photoUrls?: readonly string[]
+  helpfulCount?: number
 }
 export interface ReviewFormSubmission {
   venueId: string

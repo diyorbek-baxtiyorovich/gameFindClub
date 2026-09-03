@@ -60,4 +60,7 @@ function reload(): void {
     max-width: var(--content-max-width);
   }
 }
+@media (min-width: 900px) {
+  .shell { padding-inline: calc(var(--space-8) + var(--safe-area-right)) calc(var(--space-8) + var(--safe-area-left)); }
+}
 </style>

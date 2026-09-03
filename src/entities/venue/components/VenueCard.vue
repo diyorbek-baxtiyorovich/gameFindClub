@@ -45,6 +45,11 @@ const status = computed(() => formatOperatingStatus(props.venue.operatingStatus)
 const area = computed(() => props.venue.address?.district || props.venue.address?.city)
 const highlights = computed(() => getVenueHighlights(props.venue))
 const detailRoute = computed(() => ({ name: 'venue-detail', params: { slug: props.venue.slug } }))
+const bookingRoute = computed(() => ({ name: 'booking', params: { slug: props.venue.slug } }))
+const availabilityTone = computed(() => {
+  const count = props.venue.occupancy?.availableCount ?? 0
+  return count === 0 ? 'unavailable' : count <= 4 ? 'limited' : 'available'
+})
 
 watch(
   () => props.venue.coverMedia?.url,
@@ -84,6 +89,9 @@ watch(
       <AppBadge v-if="variant === 'featured'" class="venue-card__featured" tone="primary"
         >Featured</AppBadge
       >
+      <span class="venue-card__availability" :class="`venue-card__availability--${availabilityTone}`">
+        <span aria-hidden="true" />{{ venue.occupancy?.availableCount ?? 0 }} ta bo‘sh
+      </span>
     </RouterLink>
 
     <div class="venue-card__body">
@@ -120,14 +128,14 @@ watch(
         <li v-for="highlight in highlights" :key="highlight">{{ highlight }}</li>
       </ul>
 
+      <ul v-if="venue.badges?.length && variant !== 'map-preview'" class="venue-card__badges" aria-label="Gaming club imkoniyatlari">
+        <li v-for="badge in venue.badges.slice(0, 3)" :key="badge">{{ badge }}</li>
+      </ul>
+
       <div v-if="price || status" class="venue-card__footer">
         <p v-if="price" class="venue-card__price"><span>From</span> {{ price }}</p>
-        <span
-          v-if="status"
-          class="venue-card__status"
-          :class="{ 'venue-card__closed': venue.operatingStatus && !venue.operatingStatus.isOpen }"
-          >{{ status }}</span
-        >
+        <RouterLink v-if="venue.occupancy?.availableCount" class="venue-card__book" :to="bookingRoute">Band qilish</RouterLink>
+        <span v-else-if="status" class="venue-card__status venue-card__closed">{{ status }}</span>
       </div>
     </div>
   </article>
@@ -148,14 +156,8 @@ watch(
 .venue-card[data-accent='gaming'] {
   --venue-accent: var(--color-accent-gaming);
 }
-.venue-card[data-accent='tennis'] {
-  --venue-accent: var(--color-accent-tennis);
-}
-.venue-card[data-accent='football'] {
-  --venue-accent: var(--color-accent-football);
-}
-.venue-card[data-accent='gym'] {
-  --venue-accent: var(--color-accent-gym);
+.venue-card[data-accent='cyan'] {
+  --venue-accent: var(--color-accent-cyan);
 }
 .venue-card__media {
   position: relative;
@@ -171,7 +173,9 @@ watch(
   height: 100%;
   display: block;
   object-fit: cover;
+  transition: transform var(--motion-normal) var(--ease-standard);
 }
+.venue-card:hover .venue-card__media img { transform: scale(1.025); }
 .venue-card__placeholder {
   width: 100%;
   height: 100%;
@@ -195,6 +199,9 @@ watch(
   backdrop-filter: blur(8px);
   text-transform: uppercase;
 }
+.venue-card__availability { position:absolute;z-index:3;right:var(--space-3);bottom:var(--space-3);display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border:1px solid rgb(255 255 255 / 12%);border-radius:var(--radius-pill);color:#fff;background:rgb(7 8 13 / 82%);font-size:var(--font-size-xs);font-weight:var(--font-weight-semibold);backdrop-filter:blur(8px) }
+.venue-card__availability span { width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 10px currentColor }
+.venue-card__availability--available { color:var(--color-success) }.venue-card__availability--limited { color:var(--color-warning) }.venue-card__availability--unavailable { color:var(--color-danger) }
 .venue-card__body {
   display: grid;
   gap: var(--space-2);
@@ -277,6 +284,8 @@ watch(
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.venue-card__badges { display:flex;gap:var(--space-2);margin:0;padding:0;overflow:hidden;list-style:none }
+.venue-card__badges li { padding:3px 8px;border:1px solid color-mix(in srgb,var(--venue-accent) 26%,var(--color-border));border-radius:var(--radius-pill);color:var(--venue-accent);font-size:10px;font-weight:var(--font-weight-semibold);white-space:nowrap }
 .venue-card__highlights li {
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-pill);
@@ -312,6 +321,7 @@ watch(
   background: var(--color-surface-muted);
   font-size: var(--font-size-xs);
 }
+.venue-card__book { flex:0 0 auto;padding:7px 11px;border-radius:var(--radius-md);color:white;background:var(--color-primary);font-size:var(--font-size-xs);font-weight:var(--font-weight-semibold);text-decoration:none }
 .venue-card--compact .venue-card__body {
   gap: var(--space-2);
   padding: var(--space-3);
@@ -449,8 +459,7 @@ watch(
     justify-self: start;
   }
 }
-.venue-card--map-preview .venue-card__highlights,
-.venue-card--map-preview .venue-card__price {
+.venue-card--map-preview .venue-card__highlights {
   display: none;
 }
 .venue-card--featured {

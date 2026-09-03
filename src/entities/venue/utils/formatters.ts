@@ -60,18 +60,18 @@ export function formatOperatingStatus(
 
 export function getVenueImage(venue: Venue, fallback?: string): string | null {
   const categoryFallbacks: Readonly<Record<string, string>> = {
-    gaming:
+    'pc-gaming':
       'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=900&q=80',
-    tennis:
-      'https://images.unsplash.com/photo-1622279457486-62dcc4a431d6?auto=format&fit=crop&w=900&q=80',
-    football:
-      'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?auto=format&fit=crop&w=900&q=80',
-    gym: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=900&q=80',
+    playstation: 'https://images.unsplash.com/photo-1603481546238-487240415921?auto=format&fit=crop&w=900&q=80',
+    vr: 'https://images.unsplash.com/photo-1593508512255-86ab42a8e620?auto=format&fit=crop&w=900&q=80',
+    'private-room': 'https://images.unsplash.com/photo-1598550476439-6847785fcea6?auto=format&fit=crop&w=900&q=80',
+    bootcamp: 'https://images.unsplash.com/photo-1542751110-97427bbecf20?auto=format&fit=crop&w=900&q=80',
+    'open-24-7': 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=900&q=80',
   }
   return (
     venue.coverMedia?.url ||
     fallback ||
     categoryFallbacks[venue.category.slug] ||
-    categoryFallbacks.gym
+    categoryFallbacks['pc-gaming']
   )
 }

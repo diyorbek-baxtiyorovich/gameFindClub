@@ -2,10 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
 import type { OwnerAnalyticsSummary } from '@/entities/owner'
-import {
-  localOwnerAnalyticsRepository,
-  type OwnerAnalyticsRepository,
-} from '@/repositories/owner'
+import { localOwnerAnalyticsRepository, type OwnerAnalyticsRepository } from '@/repositories/owner'
 
 export const useOwnerAnalyticsStore = defineStore('owner-analytics', () => {
   const summary = ref<OwnerAnalyticsSummary | null>(null)

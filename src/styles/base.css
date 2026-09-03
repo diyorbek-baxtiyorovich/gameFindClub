@@ -20,6 +20,10 @@ body {
   background: var(--color-bg);
   line-height: var(--line-height-normal);
   text-rendering: optimizeLegibility;
+  background-image:
+    radial-gradient(circle at 12% -10%, rgb(139 92 246 / 10%), transparent 34rem),
+    radial-gradient(circle at 92% 12%, rgb(34 211 238 / 5%), transparent 30rem);
+  background-attachment: fixed;
 }
 
 button,

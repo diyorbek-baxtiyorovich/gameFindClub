@@ -82,6 +82,7 @@ onBeforeUnmount(() => refreshTimer && clearTimeout(refreshTimer))
 
     <p v-if="geolocation.error" class="explore-page__notice" role="status">{{ t('search.location_unavailable') }}</p>
     <ActiveFilterList :filters="filters.activeFilters" @remove="filters.removeFilter" />
+    <button v-if="filters.activeFilterCount" class="explore-page__clear" type="button" @click="filters.resetAll">Barcha filtrlarni tozalash</button>
     <ResultCount :count="venues.items.length" :loading="venues.loading" />
 
     <VenueList v-if="venues.loading" :loading="true" card-variant="default" />
@@ -102,4 +103,5 @@ onBeforeUnmount(() => refreshTimer && clearTimeout(refreshTimer))
 .explore-page__toolbar > *{flex:0 0 auto}
 .explore-page__view { display: flex; padding: 3px; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface-muted); }
 .explore-page__notice { margin: 0; padding: var(--space-3); border-radius: var(--radius-md); color: var(--color-text-secondary); background: var(--color-surface-muted); font-size: var(--font-size-sm); }
+.explore-page__clear { width:fit-content;min-height:44px;padding:0;border:0;color:var(--color-primary);background:transparent;font-weight:var(--font-weight-semibold);cursor:pointer }
 </style>

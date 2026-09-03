@@ -49,7 +49,7 @@ function apply(): void {
         <AppButton variant="ghost" @click="filters.resetAll">{{ t('filters.reset') }}</AppButton>
       </div>
       <section class="filter-sheet__group">
-        <h3>All venues</h3>
+        <h3>Gaming klub filtrlari</h3>
         <DynamicFilterControl v-for="schema in GLOBAL_FILTER_SCHEMAS" :key="schema.key" :schema="schema" :model-value="globalValue(schema.key)" @update:model-value="setGlobal(schema.key, $event)" />
       </section>
       <section v-if="filters.categorySchemas.length" class="filter-sheet__group">
@@ -57,7 +57,7 @@ function apply(): void {
         <DynamicFilterControl v-for="schema in filters.categorySchemas" :key="schema.key" :schema="schema" :model-value="filters.dynamic[schema.key]" @update:model-value="filters.setDynamic(schema.key, $event)" />
       </section>
     </div>
-    <template #footer><AppButton full-width @click="apply">{{ resultCount == null ? t('filters.apply') : `Show ${resultCount.toLocaleString()} venues` }}</AppButton></template>
+    <template #footer><AppButton full-width @click="apply">{{ resultCount == null ? t('filters.apply') : `${resultCount.toLocaleString()} ta klubni ko‘rish` }}</AppButton></template>
   </AppBottomSheet>
 </template>
 

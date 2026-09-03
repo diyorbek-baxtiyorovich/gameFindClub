@@ -2,7 +2,14 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
 import type { OwnerVenue } from '@/entities/owner'
-import type { Amenity, ContactInfo, Facility, OpeningHours, PricingOption, VenueMedia } from '@/entities/venue'
+import type {
+  Amenity,
+  ContactInfo,
+  Facility,
+  OpeningHours,
+  PricingOption,
+  VenueMedia,
+} from '@/entities/venue'
 import type {
   VenueCategoryAttributeValue,
   VenueEditorDraft,
@@ -119,7 +126,9 @@ export const useOwnerVenueDraftStore = defineStore('owner-venue-draft', () => {
     scheduleSave()
   }
 
-  function setBasicInformation(values: Partial<Pick<VenueEditorDraft, 'name' | 'shortDescription' | 'description'>>): void {
+  function setBasicInformation(
+    values: Partial<Pick<VenueEditorDraft, 'name' | 'shortDescription' | 'description'>>,
+  ): void {
     mutate((current) => ({ ...current, ...values }))
   }
 
@@ -186,7 +195,9 @@ export const useOwnerVenueDraftStore = defineStore('owner-venue-draft', () => {
 
   function scheduleSave(): void {
     clearTimeout(saveTimer)
-    saveTimer = setTimeout(() => { void saveNow() }, AUTOSAVE_DELAY_MS)
+    saveTimer = setTimeout(() => {
+      void saveNow()
+    }, AUTOSAVE_DELAY_MS)
   }
 
   async function saveNow(): Promise<void> {
@@ -198,7 +209,8 @@ export const useOwnerVenueDraftStore = defineStore('owner-venue-draft', () => {
     try {
       snapshot = cloneDraft(draft.value)
     } catch (caught) {
-      error.value = caught instanceof Error ? caught.message : 'Unable to prepare the venue draft for saving.'
+      error.value =
+        caught instanceof Error ? caught.message : 'Unable to prepare the venue draft for saving.'
       saveState.value = 'error'
       return
     }

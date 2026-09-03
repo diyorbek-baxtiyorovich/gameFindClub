@@ -16,7 +16,9 @@ export const useVenuesStore = defineStore('venues', () => {
   let activeRequest = 0
   let controller: AbortController | undefined
 
-  async function runLatest<T>(request: (signal: AbortSignal) => Promise<T>): Promise<T | undefined> {
+  async function runLatest<T>(
+    request: (signal: AbortSignal) => Promise<T>,
+  ): Promise<T | undefined> {
     const requestId = ++activeRequest
     controller?.abort()
     controller = new AbortController()
@@ -26,7 +28,10 @@ export const useVenuesStore = defineStore('venues', () => {
       const result = await request(controller.signal)
       return requestId === activeRequest ? result : undefined
     } catch (caught) {
-      if (requestId === activeRequest && !(caught instanceof DOMException && caught.name === 'AbortError')) {
+      if (
+        requestId === activeRequest &&
+        !(caught instanceof DOMException && caught.name === 'AbortError')
+      ) {
         error.value = errorMessage(caught)
       }
       return undefined
@@ -70,5 +75,16 @@ export const useVenuesStore = defineStore('venues', () => {
     loading.value = false
   }
 
-  return { items, nearby, selected, loading, error, loadItems, loadNearby, selectBySlug, clearSelected, cancelPending }
+  return {
+    items,
+    nearby,
+    selected,
+    loading,
+    error,
+    loadItems,
+    loadNearby,
+    selectBySlug,
+    clearSelected,
+    cancelPending,
+  }
 })

@@ -15,7 +15,7 @@ export interface VenueActionFeatureFlags {
 }
 
 export const FEATURE_FLAGS: Readonly<FeatureFlags> = {
-  booking: false,
+  booking: true,
   payments: false,
   loyalty: false,
   events: false,

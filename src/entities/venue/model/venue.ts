@@ -186,6 +186,10 @@ export interface Venue {
   primaryAction?: VenuePrimaryAction
   isFavorite?: boolean
   isVerified?: boolean
+  isOpen24Hours?: boolean
+  installedGames?: readonly string[]
+  badges?: readonly string[]
+  phone?: string
 }
 
 export interface VenueListItem extends Venue {

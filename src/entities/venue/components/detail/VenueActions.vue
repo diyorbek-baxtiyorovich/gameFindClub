@@ -14,6 +14,13 @@ const secondary = computed<VenuePrimaryAction[]>(() => {
       url: `tel:${props.venue.contact.phone}`,
       isAvailable: true,
     })
+  if (props.venue.location)
+    actions.push({
+      kind: 'directions',
+      label: 'Yo‘nalish',
+      url: `https://www.openstreetmap.org/?mlat=${props.venue.location.latitude}&mlon=${props.venue.location.longitude}`,
+      isAvailable: true,
+    })
   return actions
 })
 </script>
@@ -24,7 +31,7 @@ const secondary = computed<VenuePrimaryAction[]>(() => {
       :key="action.kind"
       variant="secondary"
       @click="emit('action', action)"
-      ><template #leading><AppLucideIcon class="venue-actions__icon" name="phone" /></template
+      ><template #leading><AppLucideIcon class="venue-actions__icon" :name="action.kind === 'call' ? 'phone' : 'navigation'" /></template
       >{{ action.label }}</AppButton
     >
   </div>

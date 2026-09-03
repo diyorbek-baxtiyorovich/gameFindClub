@@ -39,9 +39,9 @@ onMounted(async () => {
   await nextTick()
   if (!container.value) return
   map.value = L.map(container.value, { zoomControl: false, attributionControl: true }).setView([props.center.latitude, props.center.longitude], props.zoom)
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
     maxZoom: 19,
-    attribution: '&copy; OpenStreetMap contributors',
+    attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
   }).addTo(map.value)
   target.value = map.value
   map.value.on('moveend zoomend', emitViewport)
